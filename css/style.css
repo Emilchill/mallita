@@ -473,3 +473,38 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   background: var(--bg-soft) !important;
   border-color: var(--muted) !important;
 }
+
+/* ---------- Secondary Text Button & Responsiveness ---------- */
+.btn-secondary-text {
+  background: transparent;
+  color: var(--muted);
+  border: none;
+  font-weight: 600;
+  font-size: 13.5px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.btn-secondary-text:hover {
+  background: var(--bg-soft);
+  color: var(--text);
+}
+.btn-secondary-text:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 580px) {
+  .dash-header-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+  .header-actions {
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+

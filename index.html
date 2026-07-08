@@ -48,8 +48,11 @@
             <input class="input" type="email" id="email" placeholder="tunombre@correo.com" autocomplete="email" required>
           </div>
           <div class="field">
-            <label class="field-label" for="pass">Contraseña</label>
-            <input class="input" type="password" id="pass" placeholder="Mínimo 6 caracteres" autocomplete="current-password" required minlength="6">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <label class="field-label" for="pass" style="margin-bottom:0;">Contraseña</label>
+              <button type="button" id="btn-forgot" onclick="forgotPassword()" style="font-size:12.5px; background:none; border:none; color:var(--primary); cursor:pointer; padding:0; font-weight:600; transition:color 0.15s ease;">¿La olvidaste?</button>
+            </div>
+            <input class="input" type="password" id="pass" placeholder="Mínimo 6 caracteres" autocomplete="current-password" required minlength="6" style="margin-top:6px;">
             <p class="pw-req" id="pw-req">Debe tener al menos 6 caracteres.</p>
           </div>
           <div class="field hidden" id="field-confirm">
@@ -96,6 +99,7 @@
       onAuthStateChanged,
       GoogleAuthProvider,
       signInWithPopup,
+      sendPasswordResetEmail,
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getLocalTheme, applyTheme } from "./js/theme.js";
 
@@ -113,7 +117,43 @@
       document.getElementById("auth-sub").textContent = m === "login"
         ? "Inicia sesión para continuar con tu seguimiento académico."
         : "Solo toma un minuto. Después elegirás tu carrera y tu tema favorito.";
+      const btnForgot = document.getElementById("btn-forgot");
+      if (btnForgot) {
+        btnForgot.style.display = m === "login" ? "block" : "none";
+      }
       hideMsgs();
+    };
+
+    window.forgotPassword = async () => {
+      hideMsgs();
+      const email = document.getElementById("email").value.trim();
+      if (!email || !email.includes("@")) {
+        showErr("Escribe tu correo electrónico para enviarte el enlace de recuperación.");
+        document.getElementById("email").focus();
+        return;
+      }
+
+      const btnForgot = document.getElementById("btn-forgot");
+      const originalText = btnForgot.textContent;
+      btnForgot.disabled = true;
+      btnForgot.textContent = "Enviando...";
+
+      try {
+        await sendPasswordResetEmail(auth, email);
+        showHint("Te enviamos un enlace de recuperación. Revisa tu correo (y tu carpeta de spam).");
+      } catch (e) {
+        console.error(e);
+        if (e.code === "auth/user-not-found") {
+          showErr("No existe una cuenta registrada con este correo.");
+        } else if (e.code === "auth/invalid-email") {
+          showErr("El formato del correo electrónico no es válido.");
+        } else {
+          showErr("Error: " + e.message);
+        }
+      } finally {
+        btnForgot.disabled = false;
+        btnForgot.textContent = originalText;
+      }
     };
 
     window.loginWithGoogle = async () => {

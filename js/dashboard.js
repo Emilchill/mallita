@@ -1,5 +1,5 @@
 import { auth, db } from "./firebase-config.js";
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { PENSUMS } from "./pensums-data.js";
 import { THEMES, applyTheme, getLocalTheme, setLocalTheme, buildThemePicker } from "./theme.js";
@@ -66,6 +66,32 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 document.getElementById("btn-logout")?.addEventListener("click", () => signOut(auth));
+
+document.getElementById("btn-reset-password")?.addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user || !user.email) return;
+
+  const btn = document.getElementById("btn-reset-password");
+  const originalText = btn.textContent;
+  
+  if (!confirm("¿Deseas enviar un correo para restablecer/cambiar tu contraseña?")) {
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Enviando...";
+
+  try {
+    await sendPasswordResetEmail(auth, user.email);
+    showToast("Correo enviado para cambiar tu contraseña ✓");
+  } catch (e) {
+    console.error(e);
+    showToast("Error al enviar el correo.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+});
 
 /* ---------- Header ---------- */
 function initHeader() {
