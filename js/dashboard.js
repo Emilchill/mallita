@@ -205,7 +205,8 @@ function buildCard(materia) {
   const unlocked = done || isUnlocked(materia);
   const card = document.createElement("div");
   card.className = "subject-card" + (done ? " done" : "") + (!unlocked ? " locked" : "");
-  card.title = materia.req && materia.req !== "-" ? `Requisitos: ${materia.req}` : "Sin requisitos";
+  const reqDisplay = materia.reqLabel || materia.req;
+  card.title = materia.req && materia.req !== "-" ? `Requisitos: ${reqDisplay}` : "Sin requisitos";
 
   card.innerHTML = `
     ${!unlocked ? `<svg class="lock-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>` : ""}
