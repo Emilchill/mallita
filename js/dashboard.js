@@ -13,16 +13,6 @@ let searchTerm = "";
 const CODE_RE = /[A-Z]{2,4}-\d{3}/g;
 const COREQ_RE = /CO[-.\s]?REQ\.?\s*([A-Z]{2,4}-\d{3})/gi;
 
-// Detecta prerrequisitos de tipo "cuatrimestre completo", p.ej.:
-//   "Aprobar todas las asignaturas hasta el 5.to cuatrimestre"
-//   "Haber aprobado todas las asignaturas del 1.er al 9.no cuatrimestre"
-//   "Haber aprobado todas las asignaturas incluyendo las del 7.mo cuatrimestre"
-// Estos aparecen en Proyecto Integrador, Pasantía, Formación de Emprendedores,
-// Anteproyecto de Grado y Proyecto de Grado en las 3 carreras, y NO contienen
-// códigos de materia, así que el regex de códigos no los detectaba.
-const GATE_ORDINAL_RE = /(\d{1,2})\s*\.?\s*(?:er|do|to|no|mo|vo|ro)\b/gi;
-const GATE_KEYWORD_RE = /\b(aprobad[oa]s?|aprobar)\b/i;
-
 /* ---------- Utilidades de prerrequisitos ---------- */
 function getCoReqCodes(reqText) {
   const set = new Set();
@@ -37,81 +27,10 @@ function getPrereqCodes(materia) {
   const all = materia.req.match(CODE_RE) || [];
   return [...new Set(all)].filter(code => code !== materia.c && !coReq.has(code));
 }
-
-// Devuelve el número de cuatrimestre que debe estar 100% completo para
-// desbloquear esta materia, o null si no tiene ese tipo de requisito.
-function parseGateCuatrimestre(reqText) {
-  if (!reqText || reqText === "-") return null;
-  if (!/cuatrimestre/i.test(reqText)) return null;
-  if (!GATE_KEYWORD_RE.test(reqText)) return null;
-  let match, max = null;
-  const re = new RegExp(GATE_ORDINAL_RE.source, "gi");
-  while ((match = re.exec(reqText)) !== null) {
-    const num = parseInt(match[1], 10);
-    if (num >= 1 && num <= 12 && (max === null || num > max)) max = num;
-  }
-  return max;
-}
-
-// Estado del "gate" de cuatrimestre para una materia: cuáles son las
-// materias reales (no electivas) de los cuatrimestres 1..gate que aún
-// faltan por aprobar.
-function getGateStatus(materia) {
-  const gate = parseGateCuatrimestre(materia.req);
-  if (gate === null) return null;
-  const missing = [];
-  pensum.cuatrimestres.forEach(cuat => {
-    if (cuat.n > gate) return;
-    cuat.materias.forEach(mat => {
-      if (mat.c === "ELECTIVA" || mat.c === materia.c) return;
-      if (!doneSet.has(mat.c)) missing.push(mat);
-    });
-  });
-  return { gate, missing, ok: missing.length === 0 };
-}
-
-// Mapa código -> número de cuatrimestre, para saber "a qué cuatrimestre
-// pertenece" cada materia y poder exigir el cuatrimestre anterior completo.
-const cuatMapCache = new WeakMap();
-function getCuatMap() {
-  if (cuatMapCache.has(pensum)) return cuatMapCache.get(pensum);
-  const map = new Map();
-  pensum.cuatrimestres.forEach(cuat => {
-    cuat.materias.forEach(mat => {
-      if (mat.c !== "ELECTIVA") map.set(mat.c, cuat.n);
-    });
-  });
-  cuatMapCache.set(pensum, map);
-  return map;
-}
-
-// REGLA GENERAL DE LA UNIVERSIDAD: en un pensum cuatrimestral, para poder
-// cursar CUALQUIER materia de un cuatrimestre N hay que haber aprobado
-// TODAS las materias reales (no electivas) de los cuatrimestres 1..N-1,
-// sin importar si esa materia en particular las lista como prerrequisito
-// explícito o no. Esto es adicional a los prerrequisitos por código.
-function getMissingFromPreviousCuatrimestres(materia) {
-  const map = getCuatMap();
-  const n = map.get(materia.c);
-  if (n === undefined || n <= 1) return []; // 1er cuatrimestre no depende de nada anterior
-  const missing = [];
-  pensum.cuatrimestres.forEach(cuat => {
-    if (cuat.n >= n) return; // solo cuatrimestres estrictamente anteriores
-    cuat.materias.forEach(mat => {
-      if (mat.c === "ELECTIVA") return;
-      if (!doneSet.has(mat.c)) missing.push(mat);
-    });
-  });
-  return missing;
-}
-
 function isUnlocked(materia) {
   const prereqs = getPrereqCodes(materia);
-  const codesOk = prereqs.length === 0 || prereqs.every(code => doneSet.has(code));
-  const gateStatus = getGateStatus(materia);
-  const gateOk = gateStatus === null || gateStatus.ok;
-  const cuatMissing = getMissingFromPreviousCuatrimestres(materia);
-  return codesOk && gateOk && cuatMissing.length === 0;
+  if (prereqs.length === 0) return true;
+  return prereqs.every(code => doneSet.has(code));
 }
 
 /* ---------- Toast ---------- */
@@ -205,18 +124,7 @@ function initToolbar() {
 async function toggleSubject(materia) {
   const isDone = doneSet.has(materia.c);
   if (!isDone && !isUnlocked(materia)) {
-    const cuatMissing = getMissingFromPreviousCuatrimestres(materia);
-    const gateStatus = getGateStatus(materia);
-    if (cuatMissing.length > 0) {
-      const map = getCuatMap();
-      const n = map.get(materia.c) - 1;
-      showToast(`Debes completar todo el ${n}.º cuatrimestre antes de esta. Te falta${cuatMissing.length === 1 ? "" : "n"} ${cuatMissing.length} materia${cuatMissing.length === 1 ? "" : "s"}.`);
-    } else if (gateStatus && !gateStatus.ok) {
-      const n = gateStatus.missing.length;
-      showToast(`Debes completar todas las materias hasta el ${gateStatus.gate}.º cuatrimestre. Te falta${n === 1 ? "" : "n"} ${n} materia${n === 1 ? "" : "s"}.`);
-    } else {
-      showToast("Aún te faltan prerrequisitos para esta materia.");
-    }
+    showToast("Aún te faltan prerrequisitos para esta materia.");
     return;
   }
   if (isDone) doneSet.delete(materia.c);
@@ -294,23 +202,10 @@ function buildCard(materia) {
   }
 
   const done = doneSet.has(materia.c);
-  const gateStatus = getGateStatus(materia);
-  const cuatMissing = getMissingFromPreviousCuatrimestres(materia);
   const unlocked = done || isUnlocked(materia);
   const card = document.createElement("div");
-  card.className = "subject-card" + (done ? " done" : "") + (!unlocked ? " locked" : "") + (gateStatus ? " gate-card" : "") + (!done && cuatMissing.length > 0 ? " cuat-locked" : "");
-
-  if (cuatMissing.length > 0) {
-    const map = getCuatMap();
-    const n = map.get(materia.c) - 1;
-    card.title = `Requiere: ${n}.º cuatrimestre completo — faltan ${cuatMissing.length}: ${cuatMissing.slice(0, 6).map(mt => mt.c).join(", ")}${cuatMissing.length > 6 ? "…" : ""}`;
-  } else if (gateStatus) {
-    card.title = gateStatus.ok
-      ? `Requiere: todas las materias hasta el ${gateStatus.gate}.º cuatrimestre (cumplido ✓)`
-      : `Requiere: todas las materias hasta el ${gateStatus.gate}.º cuatrimestre — faltan ${gateStatus.missing.length}: ${gateStatus.missing.slice(0, 6).map(mt => mt.c).join(", ")}${gateStatus.missing.length > 6 ? "…" : ""}`;
-  } else {
-    card.title = materia.req && materia.req !== "-" ? `Requisitos: ${materia.req}` : "Sin requisitos";
-  }
+  card.className = "subject-card" + (done ? " done" : "") + (!unlocked ? " locked" : "");
+  card.title = materia.req && materia.req !== "-" ? `Requisitos: ${materia.req}` : "Sin requisitos";
 
   card.innerHTML = `
     ${!unlocked ? `<svg class="lock-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>` : ""}
@@ -319,7 +214,7 @@ function buildCard(materia) {
     </div>
     <span class="clave mono">${materia.c}</span>
     <span class="nombre">${materia.n}</span>
-    <span class="meta"><span>${gateStatus ? `Cuatrimestre ${gateStatus.gate} completo` : (materia.hp > 0 ? "Teórico-práctico" : "Teórico")}</span><span class="cr">${materia.cr} CR</span></span>
+    <span class="meta"><span>${materia.hp > 0 ? "Teórico-práctico" : "Teórico"}</span><span class="cr">${materia.cr} CR</span></span>
   `;
   card.addEventListener("click", () => toggleSubject(materia));
   return card;

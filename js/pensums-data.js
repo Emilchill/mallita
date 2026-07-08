@@ -81,7 +81,7 @@ const IEL = {
     { n: 6, materias: [
       m("IEL-310","Máquinas Eléctricas I",60,0,60,4,"IEL-300, IEL-305, Co-Req. IEL-315"),
       m("IEL-315","Taller de Máquinas Eléctricas I",0,30,30,1,"IEL-300, IEL-305, Co-Req. IEL-310"),
-      m("IEL-640","Proyecto Integrador I",15,120,135,5,"Aprobar todas las asignaturas hasta el 5.to cuatrimestre"),
+      m("IEL-640","Proyecto Integrador I",15,120,135,5,"ESP-181, IEL-130, IEL-140, INF-103, MAT-160, MED-750, MED-755, ORI-112, SOC-182, ESP-189, IEL-100, IEL-105, INF-113, ING-105, MAT-170, MAT-190, MAT-191, ESP-302, IEL-200, IEL-205, IMC-102, ING-115, MAT-306, SOC-114, IEL-300, IEL-305, IET-320, IET-325, IMC-100, IMC-105, IMC-320, IMC-321, ING-125, MAT-134, SOC-118, SOC-172, IEL-400, IEL-405, IET-310, IET-315, IID-420, IMC-260, ING-135, SOC-502"),
       m("IEL-810","Análisis de Circuitos Eléctricos",45,0,45,3,"IEL-300, IEL-305, MAT-360"),
       m("IET-410","Electrónica II",60,0,60,4,"IET-310, IET-315, Co-Req. IET-415"),
       m("IET-415","Taller de Electrónica II",0,30,30,1,"IET-310, IET-315, Co-Req. IET-410"),
@@ -129,13 +129,13 @@ const IEL = {
       m("SOC-420","Historia Social Dominicana",45,0,45,3),
     ]},
     { n: 10, materias: [
-      m("ADM-900","Formación de Emprendedores",45,0,45,3,"Haber aprobado todas las asignaturas del 1.er al 9.no cuatrimestre"),
+      m("ADM-900","Formación de Emprendedores",45,0,45,3,"ESP-181, IEL-130, IEL-140, INF-103, MAT-160, MED-750, MED-755, ORI-112, SOC-182, ESP-189, IEL-100, IEL-105, INF-113, ING-105, MAT-170, MAT-190, MAT-191, ESP-302, IEL-200, IEL-205, IMC-102, ING-115, MAT-306, SOC-114, IEL-300, IEL-305, IET-320, IET-325, IMC-100, IMC-105, IMC-320, IMC-321, ING-125, MAT-134, SOC-118, SOC-172, IEL-400, IEL-405, IET-310, IET-315, IID-420, IMC-260, ING-135, SOC-502, IEL-310, IEL-315, IEL-640, IEL-810, IET-410, IET-415, IMC-920, IMC-925, ING-168, SOC-155, SOC-160, IEL-410, IEL-415, IET-420, IET-425, IET-720, IET-725, IMC-630, IMC-635, IMC-700, SIC-766, ECO-525, IEL-420, IEL-425, IEL-520, IEL-525, IEL-630, IET-540, IET-545, IID-900, IMC-800, IEL-500, IEL-505, IEL-620, IEL-625, IEL-700, IEL-910, IEL-915, IMC-960, IMC-965, SOC-420"),
       m("IEL-820","Sistemas Eléctricos de Potencia I",45,0,45,3,"IEL-700, Co-Req. IEL-825"),
       m("IEL-825","Taller de Sistemas Eléctricos de Potencia I",0,30,30,1,"IEL-700, Co-Req. IEL-820"),
       m("IEL-900","Controles de Sistemas Automáticos",45,0,45,3,"IEL-410, IEL-415, Co-Req. IEL-905"),
       m("IEL-905","Taller de Controles de Sistemas Automáticos",0,30,30,1,"IEL-410, IEL-415, Co-Req. IEL-900"),
       m("IID-025","Diseño y Evaluación de Proyectos",45,0,45,3,"IID-900"),
-      m("PASANTÍA","Pasantía",0,300,300,0,"Haber aprobado todas las asignaturas hasta el 7.mo cuatrimestre"),
+      m("PASANTÍA","Pasantía",0,300,300,0,"ESP-181, IEL-130, IEL-140, INF-103, MAT-160, MED-750, MED-755, ORI-112, SOC-182, ESP-189, IEL-100, IEL-105, INF-113, ING-105, MAT-170, MAT-190, MAT-191, ESP-302, IEL-200, IEL-205, IMC-102, ING-115, MAT-306, SOC-114, IEL-300, IEL-305, IET-320, IET-325, IMC-100, IMC-105, IMC-320, IMC-321, ING-125, MAT-134, SOC-118, SOC-172, IEL-400, IEL-405, IET-310, IET-315, IID-420, IMC-260, ING-135, SOC-502, IEL-310, IEL-315, IEL-640, IEL-810, IET-410, IET-415, IMC-920, IMC-925, ING-168, SOC-155, SOC-160, IEL-410, IEL-415, IET-420, IET-425, IET-720, IET-725, IMC-630, IMC-635, IMC-700, SIC-766"),
     ]},
     { n: 11, materias: [
       m("DPG-010","Anteproyecto de Grado",60,0,60,4,"ADM-900"),
@@ -148,7 +148,7 @@ const IEL = {
       m("ELECTIVA","Electiva",45,0,45,3),
     ]},
     { n: 12, materias: [
-      m("DPG-020","Proyecto de Grado",90,0,90,6,"Haber aprobado todas las asignaturas hasta el 11.mo cuatrimestre"),
+      m("DPG-020","Proyecto de Grado",90,0,90,6,"ESP-181, IEL-130, IEL-140, INF-103, MAT-160, MED-750, MED-755, ORI-112, SOC-182, ESP-189, IEL-100, IEL-105, INF-113, ING-105, MAT-170, MAT-190, MAT-191, ESP-302, IEL-200, IEL-205, IMC-102, ING-115, MAT-306, SOC-114, IEL-300, IEL-305, IET-320, IET-325, IMC-100, IMC-105, IMC-320, IMC-321, ING-125, MAT-134, SOC-118, SOC-172, IEL-400, IEL-405, IET-310, IET-315, IID-420, IMC-260, ING-135, SOC-502, IEL-310, IEL-315, IEL-640, IEL-810, IET-410, IET-415, IMC-920, IMC-925, ING-168, SOC-155, SOC-160, IEL-410, IEL-415, IET-420, IET-425, IET-720, IET-725, IMC-630, IMC-635, IMC-700, SIC-766, ECO-525, IEL-420, IEL-425, IEL-520, IEL-525, IEL-630, IET-540, IET-545, IID-900, IMC-800, IEL-500, IEL-505, IEL-620, IEL-625, IEL-700, IEL-910, IEL-915, IMC-960, IMC-965, SOC-420, ADM-900, IEL-820, IEL-825, IEL-900, IEL-905, IID-025, DPG-010, IEL-930, IEL-940, IEL-950, IEL-955, IEL-960, IEL-970"),
     ]},
   ],
   electivas: [
@@ -233,7 +233,7 @@ const IID = {
       m("SOC-502","Ciudadanía y Globalización",30,0,30,2),
     ]},
     { n: 6, materias: [
-      m("IID-650","Proyecto Integrador",30,90,120,5,"Haber aprobado todas las asignaturas hasta el 5to cuatrimestre"),
+      m("IID-650","Proyecto Integrador",30,90,120,5,"ARQ-130, ESP-181, IID-105, INF-103, MAT-160, ORI-112, SOC-182, ESP-189, IID-480, IID-481, INF-113, INF-117, ING-105, MAT-170, MED-750, MED-755, ESP-302, IID-420, ING-115, MAT-306, MAT-340, MED-770, MED-774, SOC-114, IID-950, IMC-320, IMC-321, ING-125, MAT-134, MAT-350, SOC-118, SOC-172, IID-522, IID-630, IID-631, ING-135, MAT-190, MAT-191, MAT-360, MAT-370, SOC-502"),
       m("ING-168","Inglés Profesional",60,0,60,0,"ING-135"),
       m("MAT-135","Estadística para Ingenieros I",45,0,45,3,"MAT-134"),
       m("MAT-500","Física II",60,0,60,4,"MAT-190, MAT-191, Co-Req. MAT-501"),
@@ -251,7 +251,7 @@ const IID = {
       m("MAT-510","Física III",60,0,60,4,"MAT-500, MAT-501, Co-Req. MAT-511"),
       m("MAT-511","Lab. Física III",0,30,30,1,"MAT-500, MAT-501, Co-Req. MAT-510"),
       m("SIC-766","Inteligencia Emocional",15,30,45,2),
-      m("PASANTÍA","Pasantía Laboral",0,240,240,0,"Haber aprobado todas las asignaturas hasta el 6.to cuatrimestre"),
+      m("PASANTÍA","Pasantía Laboral",0,240,240,0,"ARQ-130, ESP-181, IID-105, INF-103, MAT-160, ORI-112, SOC-182, ESP-189, IID-480, IID-481, INF-113, INF-117, ING-105, MAT-170, MED-750, MED-755, ESP-302, IID-420, ING-115, MAT-306, MAT-340, MED-770, MED-774, SOC-114, IID-950, IMC-320, IMC-321, ING-125, MAT-134, MAT-350, SOC-118, SOC-172, IID-522, IID-630, IID-631, ING-135, MAT-190, MAT-191, MAT-360, MAT-370, SOC-502, IID-650, ING-168, MAT-135, MAT-500, MAT-501, SOC-140, SOC-155, SOC-160"),
     ]},
     { n: 8, materias: [
       m("ECO-525","Finanzas Personales",30,0,30,2),
@@ -277,7 +277,7 @@ const IID = {
       m("IMC-805","Taller de Termodinámica I",0,30,30,1,"IMC-920, IMC-925, Co-Req. IID-800"),
     ]},
     { n: 10, materias: [
-      m("ADM-900","Formación de Emprendedores",30,30,60,3,"Haber aprobado todas las asignaturas del 1.er al 9.no cuatrimestre"),
+      m("ADM-900","Formación de Emprendedores",30,30,60,3,"ARQ-130, ESP-181, IID-105, INF-103, MAT-160, ORI-112, SOC-182, ESP-189, IID-480, IID-481, INF-113, INF-117, ING-105, MAT-170, MED-750, MED-755, ESP-302, IID-420, ING-115, MAT-306, MAT-340, MED-770, MED-774, SOC-114, IID-950, IMC-320, IMC-321, ING-125, MAT-134, MAT-350, SOC-118, SOC-172, IID-522, IID-630, IID-631, ING-135, MAT-190, MAT-191, MAT-360, MAT-370, SOC-502, IID-650, ING-168, MAT-135, MAT-500, MAT-501, SOC-140, SOC-155, SOC-160, IID-285, IID-640, IID-980, IMC-920, IMC-925, MAT-510, MAT-511, SIC-766, ECO-525, IEL-110, IEL-115, IET-110, IET-115, IID-720, IID-725, IID-870, INF-705, INF-706, IID-235, IID-240, IID-241, IID-830, IID-890, IID-915, IID-945, IMC-800, IMC-805"),
       m("IID-750","Automatización y Control de Procesos",30,30,60,3,"IID-240, IID-241"),
       m("IID-810","Gerencia Industrial",30,30,60,3,"IID-235"),
       m("IID-905","Diseño de Sistemas de Producción II",30,30,60,3,"IID-235"),
@@ -295,7 +295,7 @@ const IID = {
       m("IMC-260","Mecánica Vectorial",60,0,60,4,"MAT-190, MAT-191"),
     ]},
     { n: 12, materias: [
-      m("DPG-020","Proyecto de Grado",90,0,90,6,"Haber aprobado todas las asignaturas hasta el 11.mo cuatrimestre"),
+      m("DPG-020","Proyecto de Grado",90,0,90,6,"ARQ-130, ESP-181, IID-105, INF-103, MAT-160, ORI-112, SOC-182, ESP-189, IID-480, IID-481, INF-113, INF-117, ING-105, MAT-170, MED-750, MED-755, ESP-302, IID-420, ING-115, MAT-306, MAT-340, MED-770, MED-774, SOC-114, IID-950, IMC-320, IMC-321, ING-125, MAT-134, MAT-350, SOC-118, SOC-172, IID-522, IID-630, IID-631, ING-135, MAT-190, MAT-191, MAT-360, MAT-370, SOC-502, IID-650, ING-168, MAT-135, MAT-500, MAT-501, SOC-140, SOC-155, SOC-160, IID-285, IID-640, IID-980, IMC-920, IMC-925, MAT-510, MAT-511, SIC-766, ECO-525, IEL-110, IEL-115, IET-110, IET-115, IID-720, IID-725, IID-870, INF-705, INF-706, IID-235, IID-240, IID-241, IID-830, IID-890, IID-915, IID-945, IMC-800, IMC-805, ADM-900, IID-750, IID-810, IID-905, IID-930, IID-935, IID-941, IID-955, ADM-910, DER-675, DPG-010, IID-025, IID-925, IMC-260"),
     ]},
   ],
   electivas: [
@@ -383,8 +383,8 @@ const ISC = {
       m("INF-185","Laboratorio de Sistemas Operativos",0,30,30,1,"INF-440, INF-445, Co-Req. INF-184"),
       m("INF-217","Algoritmos y Estructuras de Datos",30,0,30,2,"INF-172, INF-173, Co-Req. INF-218"),
       m("INF-218","Laboratorio de Algoritmos y Estructuras de Datos",0,30,30,1,"INF-172, INF-173, Co-Req. INF-217"),
-      m("INF-225","Proyecto Integrador I",30,90,120,5,"Aprobar todas las asignaturas hasta el 5.to cuatrimestre"),
-      m("INF-331","Seminario de Informática",45,0,45,3,"Aprobar todas las asignaturas hasta el 5.to cuatrimestre"),
+      m("INF-225","Proyecto Integrador I",30,90,120,5,"ESP-181, INF-117, ING-105, MAT-115, MAT-160, MED-750, MED-755, ORI-112, SOC-182, ESP-189, INF-164, INF-165, INF-204, ING-115, MAT-170, MAT-190, MAT-191, ESP-302, INF-121, INF-167, INF-168, ING-125, MAT-306, MAT-340, MAT-500, MAT-501, SOC-114, IEL-100, IEL-105, INF-171, INF-172, INF-173, INF-385, INF-387, ING-135, MAT-134, MAT-350, SOC-118, SOC-172, DIB-520, IID-420, INF-440, INF-445, INF-481, INF-482, INF-535, MAT-360, SOC-502"),
+      m("INF-331","Seminario de Informática",45,0,45,3,"ESP-181, INF-117, ING-105, MAT-115, MAT-160, MED-750, MED-755, ORI-112, SOC-182, ESP-189, INF-164, INF-165, INF-204, ING-115, MAT-170, MAT-190, MAT-191, ESP-302, INF-121, INF-167, INF-168, ING-125, MAT-306, MAT-340, MAT-500, MAT-501, SOC-114, IEL-100, IEL-105, INF-171, INF-172, INF-173, INF-385, INF-387, ING-135, MAT-134, MAT-350, SOC-118, SOC-172, DIB-520, IID-420, INF-440, INF-445, INF-481, INF-482, INF-535, MAT-360, SOC-502"),
       m("INF-640","Minería de Datos",30,30,60,3,"INF-481, INF-482"),
       m("ING-168","Inglés Profesional",60,0,60,0,"ING-135"),
       m("MAT-135","Estadística para Ingenieros I",45,0,45,3,"MAT-134"),
@@ -407,7 +407,7 @@ const ISC = {
       m("INF-241","Ingeniería de Software I",45,0,45,3,"INF-225"),
       m("INF-810","Auditoría de Sistemas Informáticos",45,0,45,3,"INF-225"),
       m("INF-840","Programación de Dispositivos Móviles",15,60,75,3,"INF-535, INF-700"),
-      m("PASANTÍA","Pasantía",0,240,240,0,"Haber aprobado todas las asignaturas incluyendo las del 7.mo cuatrimestre"),
+      m("PASANTÍA","Pasantía",0,240,240,0,"ESP-181, INF-117, ING-105, MAT-115, MAT-160, MED-750, MED-755, ORI-112, SOC-182, ESP-189, INF-164, INF-165, INF-204, ING-115, MAT-170, MAT-190, MAT-191, ESP-302, INF-121, INF-167, INF-168, ING-125, MAT-306, MAT-340, MAT-500, MAT-501, SOC-114, IEL-100, IEL-105, INF-171, INF-172, INF-173, INF-385, INF-387, ING-135, MAT-134, MAT-350, SOC-118, SOC-172, DIB-520, IID-420, INF-440, INF-445, INF-481, INF-482, INF-535, MAT-360, SOC-502, INF-184, INF-185, INF-217, INF-218, INF-225, INF-331, INF-640, ING-168, MAT-135, SOC-160, INF-502, INF-503, INF-700, INF-705, INF-706, INF-710, MAT-145, SIC-766, SOC-155"),
     ]},
     { n: 9, materias: [
       m("ADM-910","Liderazgo y Desempeño",45,0,45,3),
@@ -420,7 +420,7 @@ const ISC = {
       m("ELECTIVA","Electiva",45,0,45,3),
     ]},
     { n: 10, materias: [
-      m("ADM-900","Formación de Emprendedores",30,30,60,3,"Haber aprobado todas las asignaturas del 1.er al 9.no cuatrimestre"),
+      m("ADM-900","Formación de Emprendedores",30,30,60,3,"ESP-181, INF-117, ING-105, MAT-115, MAT-160, MED-750, MED-755, ORI-112, SOC-182, ESP-189, INF-164, INF-165, INF-204, ING-115, MAT-170, MAT-190, MAT-191, ESP-302, INF-121, INF-167, INF-168, ING-125, MAT-306, MAT-340, MAT-500, MAT-501, SOC-114, IEL-100, IEL-105, INF-171, INF-172, INF-173, INF-385, INF-387, ING-135, MAT-134, MAT-350, SOC-118, SOC-172, DIB-520, IID-420, INF-440, INF-445, INF-481, INF-482, INF-535, MAT-360, SOC-502, INF-184, INF-185, INF-217, INF-218, INF-225, INF-331, INF-640, ING-168, MAT-135, SOC-160, INF-502, INF-503, INF-700, INF-705, INF-706, INF-710, MAT-145, SIC-766, SOC-155, ECO-525, IID-725, INF-241, INF-810, INF-840, ADM-910, IID-830, INF-021, INF-411, INF-412, INF-450, INF-910"),
       m("IID-945","Ingeniería Económica",30,30,60,3,"MAT-360"),
       m("INF-344","Telecomunicación de Datos",30,0,30,2,"INF-411, INF-412, Co-Req. INF-345"),
       m("INF-345","Laboratorio de Telecomunicación de Datos",0,30,30,1,"INF-411, INF-412, Co-Req. INF-344"),
@@ -436,7 +436,7 @@ const ISC = {
       m("ELECTIVA","Electiva",45,0,45,3),
     ]},
     { n: 12, materias: [
-      m("DPG-020","Proyecto de Grado",45,90,135,6,"Haber aprobado todas las asignaturas hasta el 11.mo cuatrimestre"),
+      m("DPG-020","Proyecto de Grado",45,90,135,6,"ESP-181, INF-117, ING-105, MAT-115, MAT-160, MED-750, MED-755, ORI-112, SOC-182, ESP-189, INF-164, INF-165, INF-204, ING-115, MAT-170, MAT-190, MAT-191, ESP-302, INF-121, INF-167, INF-168, ING-125, MAT-306, MAT-340, MAT-500, MAT-501, SOC-114, IEL-100, IEL-105, INF-171, INF-172, INF-173, INF-385, INF-387, ING-135, MAT-134, MAT-350, SOC-118, SOC-172, DIB-520, IID-420, INF-440, INF-445, INF-481, INF-482, INF-535, MAT-360, SOC-502, INF-184, INF-185, INF-217, INF-218, INF-225, INF-331, INF-640, ING-168, MAT-135, SOC-160, INF-502, INF-503, INF-700, INF-705, INF-706, INF-710, MAT-145, SIC-766, SOC-155, ECO-525, IID-725, INF-241, INF-810, INF-840, ADM-910, IID-830, INF-021, INF-411, INF-412, INF-450, INF-910, ADM-900, IID-945, INF-344, INF-345, INF-433, INF-920, DPG-010, IID-025, INF-025, INF-820"),
     ]},
   ],
   electivas: [
