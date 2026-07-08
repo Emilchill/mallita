@@ -1,213 +1,59 @@
-<!DOCTYPE html>
-<html lang="es" data-theme="utesa">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Malla Estudiantil | Proyecto Estudiantes</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        :root { --p: #006837; --bg: #f3f4f6; --card: #ffffff; --txt: #1e293b; }
-        [data-theme="dark"] { --p: #3b82f6; --bg: #0f172a; --card: #1e293b; --txt: #f8fafc; }
-        [data-theme="sunset"] { --p: #f97316; --bg: #fff7ed; --card: #ffffff; --txt: #431407; }
+// theme.js
+// Maneja los 6 temas de color disponibles y su persistencia.
+// - Antes de iniciar sesión: se guarda en localStorage (clave "malla_theme").
+// - Después de iniciar sesión: se guarda también en Firestore (users/{uid}.theme)
+//   para que el estudiante vea su tema en cualquier dispositivo donde inicie sesión.
 
-        body { background: var(--bg); color: var(--txt); transition: 0.3s; font-family: sans-serif; }
-        .card { background: var(--card); border-radius: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .subject-card { border: 1px solid rgba(0,0,0,0.1); padding: 10px; border-radius: 12px; min-height: 90px; cursor: pointer; font-size: 11px; }
-        .subject-card.done { background: var(--p) !important; color: white !important; }
-        .hidden { display: none; }
-        .tab-active { border-bottom: 3px solid var(--p); font-weight: bold; color: var(--p); }
-    </style>
-</head>
-<body class="min-h-screen">
+export const THEMES = [
+  { id: "utesa",     nombre: "UTESA Clásico",   swatch: ["#00542B", "#C89B3C", "#F7F8F5"] },
+  { id: "medianoche",nombre: "Medianoche",      swatch: ["#5B8DEF", "#F2B84B", "#0B1220"] },
+  { id: "atardecer", nombre: "Atardecer",       swatch: ["#E85D2C", "#FFB627", "#FFF6ED"] },
+  { id: "oceano",    nombre: "Océano",          swatch: ["#0E7C86", "#21B0A6", "#EFF7F9"] },
+  { id: "violeta",   nombre: "Violeta Nocturno",swatch: ["#8B6FEA", "#E85DA0", "#150F26"] },
+  { id: "coral",     nombre: "Coral",           swatch: ["#E23F63", "#FF8FA3", "#FFF4F5"] },
+];
 
-    <!-- LOGIN / REGISTRO -->
-    <div id="view-auth" class="flex items-center justify-center min-h-screen p-6">
-        <div class="card p-8 w-full max-w-md">
-            <h1 class="text-3xl font-black text-center mb-6 text-[var(--p)]">Malla Estudiantil</h1>
-            
-            <div class="flex mb-6 border-b">
-                <button onclick="setAuthMode('login')" id="t-login" class="flex-1 py-2 tab-active">Iniciar Sesión</button>
-                <button onclick="setAuthMode('register')" id="t-reg" class="flex-1 py-2 opacity-50">Registrarme</button>
-            </div>
+const STORAGE_KEY = "malla_theme";
+const DEFAULT_THEME = "utesa";
 
-            <div class="space-y-4">
-                <input type="email" id="email" placeholder="Correo electrónico" class="w-full p-3 border rounded-xl text-black outline-none border-gray-300">
-                <input type="password" id="pass" placeholder="Contraseña (mín. 6)" class="w-full p-3 border rounded-xl text-black outline-none border-gray-300">
-                <button onclick="handleAuthAction()" id="btn-auth" class="w-full bg-[var(--p)] text-white p-3 rounded-xl font-bold">Entrar</button>
-                <p id="err-msg" class="text-xs text-red-500 text-center font-bold"></p>
-            </div>
-        </div>
-    </div>
+export function getLocalTheme() {
+  return localStorage.getItem(STORAGE_KEY) || DEFAULT_THEME;
+}
 
-    <!-- PERFIL -->
-    <div id="view-profile" class="hidden flex items-center justify-center min-h-screen p-6">
-        <div class="card p-8 w-full max-w-md">
-            <h2 class="text-2xl font-bold mb-4 italic">Perfil Estudiantil</h2>
-            <div class="space-y-4">
-                <input type="text" id="user-name-in" placeholder="Tu nombre" class="w-full p-3 border rounded-xl text-black">
-                <select id="user-career-in" class="w-full p-3 border rounded-xl text-black">
-                    <option value="ISC">Sistemas Computacionales</option>
-                    <option value="IEL">Ingeniería Eléctrica</option>
-                    <option value="IID">Ingeniería Industrial</option>
-                </select>
-                <button onclick="finishProfile()" class="w-full bg-[var(--p)] text-white p-3 rounded-xl font-bold">Guardar y Continuar</button>
-            </div>
-        </div>
-    </div>
+export function setLocalTheme(id) {
+  localStorage.setItem(STORAGE_KEY, id);
+}
 
-    <!-- DASHBOARD -->
-    <div id="view-dash" class="hidden min-h-screen p-6">
-        <header class="max-w-7xl mx-auto flex justify-between items-center mb-10">
-            <div>
-                <h1 id="hi-name" class="text-3xl font-black italic">Hola</h1>
-                <p id="hi-career" class="text-xs font-bold opacity-50 uppercase"></p>
-            </div>
-            <button onclick="logout()" class="text-red-500 font-bold">SALIR</button>
-        </header>
+export function applyTheme(id) {
+  const valid = THEMES.some(t => t.id === id) ? id : DEFAULT_THEME;
+  document.documentElement.setAttribute("data-theme", valid);
+  setLocalTheme(valid);
+  document.querySelectorAll("[data-theme-option]").forEach(el => {
+    el.classList.toggle("theme-active", el.getAttribute("data-theme-option") === valid);
+  });
+}
 
-        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div class="lg:col-span-1 text-center card p-6">
-                <h3 class="text-xs font-black opacity-30 mb-4">MI PROGRESO</h3>
-                <div class="text-5xl font-black text-[var(--p)]" id="perc-txt">0%</div>
-                <p id="perc-desc" class="text-xs mt-4 italic opacity-60"></p>
-            </div>
-            <div class="lg:col-span-3 card p-8">
-                <div id="malla-content" class="space-y-10"></div>
-            </div>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDYUFGIjFkEAYACGD2l8Rzoo1x4Qcd5KhE",
-            authDomain: "malla-curricular-38175.firebaseapp.com",
-            projectId: "malla-curricular-38175",
-            storageBucket: "malla-curricular-38175.firebasestorage.app",
-            messagingSenderId: "1010936934232",
-            appId: "1:1010936934232:web:5a6f313b80f9c879e47f2d"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let mode = 'login';
-        let userData = null;
-
-        const PENSUMS = {
-            "ISC": { name: "Sistemas", malla: [{c:1, m:[{id:"INF117",n:"Algoritmos",cr:4},{id:"MAT160",n:"Precalculo",cr:4}]}, {c:2, m:[{id:"INF164",n:"Prog I",cr:3},{id:"MAT170",n:"Calculo I",cr:4}]}] },
-            "IEL": { name: "Eléctrica", malla: [{c:1, m:[{id:"IEL130",n:"Hist. Eléc",cr:2},{id:"MAT160",n:"Precalculo",cr:4}]}] },
-            "IID": { name: "Industrial", malla: [{c:1, m:[{id:"IID105",n:"Int. Industrial",cr:2},{id:"MAT160",n:"Precalculo",cr:4}]}] }
-        };
-
-        window.setAuthMode = (m) => {
-            mode = m;
-            document.getElementById('t-login').className = m === 'login' ? 'flex-1 py-2 tab-active' : 'flex-1 py-2 opacity-50';
-            document.getElementById('t-reg').className = m === 'register' ? 'flex-1 py-2 tab-active' : 'flex-1 py-2 opacity-50';
-            document.getElementById('btn-auth').innerText = m === 'login' ? 'Entrar' : 'Registrar Cuenta';
-        };
-
-        window.handleAuthAction = async () => {
-            const email = document.getElementById('email').value.trim();
-            const pass = document.getElementById('pass').value;
-            const err = document.getElementById('err-msg');
-            err.innerText = "Procesando...";
-
-            if(!email || pass.length < 6) {
-                err.innerText = "Email válido y clave de 6+ caracteres.";
-                return;
-            }
-
-            try {
-                if(mode === 'login') {
-                    await signInWithEmailAndPassword(auth, email, pass);
-                } else {
-                    await createUserWithEmailAndPassword(auth, email, pass);
-                }
-            } catch (e) {
-                console.error(e.code);
-                if(e.code === 'auth/user-not-found') err.innerText = "El usuario no existe. ¡Regístrate!";
-                else if(e.code === 'auth/wrong-password') err.innerText = "Contraseña incorrecta.";
-                else if(e.code === 'auth/email-already-in-use') err.innerText = "Ese correo ya tiene cuenta.";
-                else err.innerText = "Error: " + e.code;
-            }
-        };
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const snap = await getDoc(doc(db, "users", user.uid));
-                if (snap.exists()) {
-                    userData = snap.data();
-                    renderDash();
-                } else { showView('view-profile'); }
-            } else { showView('view-auth'); }
-        });
-
-        window.finishProfile = async () => {
-            const name = document.getElementById('user-name-in').value;
-            const career = document.getElementById('user-career-in').value;
-            if(!name) return alert("Pon tu nombre");
-            const d = { name, career, done: [] };
-            await setDoc(doc(db, "users", auth.currentUser.uid), d);
-            userData = d;
-            renderDash();
-        };
-
-        function renderDash() {
-            showView('view-dash');
-            document.getElementById('hi-name').innerText = `Hola, ${userData.name}`;
-            const p = PENSUMS[userData.career];
-            document.getElementById('hi-career').innerText = p.name;
-            
-            const cont = document.getElementById('malla-content');
-            cont.innerHTML = '';
-            
-            p.malla.forEach(cuat => {
-                const div = document.createElement('div');
-                div.innerHTML = `<h4 class="text-[10px] font-bold opacity-30 mb-4 uppercase tracking-widest">Cuatrimestre ${cuat.c}</h4>`;
-                const g = document.createElement('div');
-                g.className = "grid grid-cols-2 md:grid-cols-4 gap-4";
-                cuat.m.forEach(m => {
-                    const isDone = userData.done.includes(m.id);
-                    const card = document.createElement('div');
-                    card.className = `subject-card card ${isDone ? 'done' : 'bg-white text-black'}`;
-                    card.innerHTML = `<span class="opacity-40">${m.id}</span><span class="font-bold my-1 text-center">${m.n}</span><span class="opacity-40 text-right italic">${m.cr} CR</span>`;
-                    card.onclick = () => toggleSubject(m.id);
-                    g.appendChild(card);
-                });
-                div.appendChild(g);
-                cont.appendChild(div);
-            });
-            updateStats();
-        }
-
-        async function toggleSubject(id) {
-            let list = [...userData.done];
-            if(list.includes(id)) list = list.filter(i => i !== id);
-            else list.push(id);
-            userData.done = list;
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { done: list });
-            renderDash();
-        }
-
-        function updateStats() {
-            const info = PENSUMS[userData.career];
-            const total = info.malla.flatMap(c => c.m).length;
-            const done = userData.done.length;
-            const perc = Math.round((done/total)*100) || 0;
-            document.getElementById('perc-txt').innerText = perc + "%";
-            document.getElementById('perc-desc').innerText = `Has completado ${done} de ${total} materias del pensum.`;
-        }
-
-        function showView(id) {
-            ['view-auth', 'view-profile', 'view-dash'].forEach(v => document.getElementById(v).classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-        }
-        window.logout = () => signOut(auth);
-    </script>
-</body>
-</html>
+// Construye el selector visual de temas dentro de un contenedor dado.
+// onSelect(id) se llama cada vez que el usuario elige un tema (para persistir en Firestore).
+export function buildThemePicker(container, onSelect) {
+  container.innerHTML = "";
+  const current = document.documentElement.getAttribute("data-theme") || getLocalTheme();
+  THEMES.forEach(t => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "theme-swatch" + (t.id === current ? " theme-active" : "");
+    btn.setAttribute("data-theme-option", t.id);
+    btn.title = t.nombre;
+    btn.innerHTML = `
+      <span class="theme-dots">
+        <i style="background:${t.swatch[0]}"></i><i style="background:${t.swatch[1]}"></i><i style="background:${t.swatch[2]}"></i>
+      </span>
+      <span class="theme-label">${t.nombre}</span>
+    `;
+    btn.addEventListener("click", () => {
+      applyTheme(t.id);
+      if (typeof onSelect === "function") onSelect(t.id);
+    });
+    container.appendChild(btn);
+  });
+}
