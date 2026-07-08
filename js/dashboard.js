@@ -70,12 +70,48 @@ function getGateStatus(materia) {
   return { gate, missing, ok: missing.length === 0 };
 }
 
+// Mapa código -> número de cuatrimestre, para saber "a qué cuatrimestre
+// pertenece" cada materia y poder exigir el cuatrimestre anterior completo.
+const cuatMapCache = new WeakMap();
+function getCuatMap() {
+  if (cuatMapCache.has(pensum)) return cuatMapCache.get(pensum);
+  const map = new Map();
+  pensum.cuatrimestres.forEach(cuat => {
+    cuat.materias.forEach(mat => {
+      if (mat.c !== "ELECTIVA") map.set(mat.c, cuat.n);
+    });
+  });
+  cuatMapCache.set(pensum, map);
+  return map;
+}
+
+// REGLA GENERAL DE LA UNIVERSIDAD: en un pensum cuatrimestral, para poder
+// cursar CUALQUIER materia de un cuatrimestre N hay que haber aprobado
+// TODAS las materias reales (no electivas) de los cuatrimestres 1..N-1,
+// sin importar si esa materia en particular las lista como prerrequisito
+// explícito o no. Esto es adicional a los prerrequisitos por código.
+function getMissingFromPreviousCuatrimestres(materia) {
+  const map = getCuatMap();
+  const n = map.get(materia.c);
+  if (n === undefined || n <= 1) return []; // 1er cuatrimestre no depende de nada anterior
+  const missing = [];
+  pensum.cuatrimestres.forEach(cuat => {
+    if (cuat.n >= n) return; // solo cuatrimestres estrictamente anteriores
+    cuat.materias.forEach(mat => {
+      if (mat.c === "ELECTIVA") return;
+      if (!doneSet.has(mat.c)) missing.push(mat);
+    });
+  });
+  return missing;
+}
+
 function isUnlocked(materia) {
   const prereqs = getPrereqCodes(materia);
   const codesOk = prereqs.length === 0 || prereqs.every(code => doneSet.has(code));
   const gateStatus = getGateStatus(materia);
   const gateOk = gateStatus === null || gateStatus.ok;
-  return codesOk && gateOk;
+  const cuatMissing = getMissingFromPreviousCuatrimestres(materia);
+  return codesOk && gateOk && cuatMissing.length === 0;
 }
 
 /* ---------- Toast ---------- */
@@ -169,8 +205,13 @@ function initToolbar() {
 async function toggleSubject(materia) {
   const isDone = doneSet.has(materia.c);
   if (!isDone && !isUnlocked(materia)) {
+    const cuatMissing = getMissingFromPreviousCuatrimestres(materia);
     const gateStatus = getGateStatus(materia);
-    if (gateStatus && !gateStatus.ok) {
+    if (cuatMissing.length > 0) {
+      const map = getCuatMap();
+      const n = map.get(materia.c) - 1;
+      showToast(`Debes completar todo el ${n}.º cuatrimestre antes de esta. Te falta${cuatMissing.length === 1 ? "" : "n"} ${cuatMissing.length} materia${cuatMissing.length === 1 ? "" : "s"}.`);
+    } else if (gateStatus && !gateStatus.ok) {
       const n = gateStatus.missing.length;
       showToast(`Debes completar todas las materias hasta el ${gateStatus.gate}.º cuatrimestre. Te falta${n === 1 ? "" : "n"} ${n} materia${n === 1 ? "" : "s"}.`);
     } else {
@@ -254,11 +295,16 @@ function buildCard(materia) {
 
   const done = doneSet.has(materia.c);
   const gateStatus = getGateStatus(materia);
+  const cuatMissing = getMissingFromPreviousCuatrimestres(materia);
   const unlocked = done || isUnlocked(materia);
   const card = document.createElement("div");
-  card.className = "subject-card" + (done ? " done" : "") + (!unlocked ? " locked" : "") + (gateStatus ? " gate-card" : "");
+  card.className = "subject-card" + (done ? " done" : "") + (!unlocked ? " locked" : "") + (gateStatus ? " gate-card" : "") + (!done && cuatMissing.length > 0 ? " cuat-locked" : "");
 
-  if (gateStatus) {
+  if (cuatMissing.length > 0) {
+    const map = getCuatMap();
+    const n = map.get(materia.c) - 1;
+    card.title = `Requiere: ${n}.º cuatrimestre completo — faltan ${cuatMissing.length}: ${cuatMissing.slice(0, 6).map(mt => mt.c).join(", ")}${cuatMissing.length > 6 ? "…" : ""}`;
+  } else if (gateStatus) {
     card.title = gateStatus.ok
       ? `Requiere: todas las materias hasta el ${gateStatus.gate}.º cuatrimestre (cumplido ✓)`
       : `Requiere: todas las materias hasta el ${gateStatus.gate}.º cuatrimestre — faltan ${gateStatus.missing.length}: ${gateStatus.missing.slice(0, 6).map(mt => mt.c).join(", ")}${gateStatus.missing.length > 6 ? "…" : ""}`;
