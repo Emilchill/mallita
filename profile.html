@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="utesa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Completa tu perfil · Malla UTESA</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="disclaimer-strip">
+    <strong>Proyecto estudiantil independiente</strong> — no es un sitio oficial de UTESA.
+  </div>
+
+  <div class="profile-shell">
+    <div class="card profile-box">
+      <span class="kicker" style="color:var(--primary); font-weight:700; font-size:12.5px; text-transform:uppercase; letter-spacing:.07em;">Último paso</span>
+      <h2 style="margin:8px 0 4px; font-size:25px;">Cuéntanos un poco de ti</h2>
+      <p class="sub muted" style="margin-bottom:22px; font-size:14.5px;">Esto nos permite mostrarte el pensum correcto y tu progreso real.</p>
+
+      <div class="field">
+        <label class="field-label" for="user-name-in">Nombre completo</label>
+        <input class="input" type="text" id="user-name-in" placeholder="Ej. Juan Pérez" autocomplete="name">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Tu carrera</label>
+        <div class="career-grid" id="career-grid"></div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Elige un tema de color (puedes cambiarlo luego)</label>
+        <div id="theme-picker" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-save" style="width:100%; margin-top:6px;">Guardar y ver mi malla</button>
+      <div class="err-box" id="err-msg"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./js/firebase-config.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { PENSUMS } from "./js/pensums-data.js";
+    import { THEMES, getLocalTheme, applyTheme } from "./js/theme.js";
+
+    applyTheme(getLocalTheme());
+
+    let selectedCareer = null;
+    let selectedTheme = getLocalTheme();
+
+    // Construir tarjetas de carrera dinámicamente desde pensums-data.js
+    const careerGrid = document.getElementById("career-grid");
+    Object.values(PENSUMS).forEach(p => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "career-option";
+      btn.dataset.key = p.key;
+      btn.innerHTML = `
+        <span class="career-badge" style="background:${p.color}">${p.key}</span>
+        <span class="career-info">
+          <strong>${p.nombre}</strong>
+          <span>${p.titulo} · ${p.totalCreditos} créditos</span>
+        </span>
+      `;
+      btn.addEventListener("click", () => {
+        selectedCareer = p.key;
+        document.querySelectorAll(".career-option").forEach(el => el.classList.remove("selected"));
+        btn.classList.add("selected");
+      });
+      careerGrid.appendChild(btn);
+    });
+
+    // Selector de temas simple (sin persistencia en Firestore todavía, se guarda al final)
+    const themePicker = document.getElementById("theme-picker");
+    function renderThemePicker() {
+      themePicker.innerHTML = "";
+      THEMES.forEach(t => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "theme-swatch" + (t.id === selectedTheme ? " theme-active" : "");
+        b.style.width = "auto";
+        b.style.flexDirection = "row";
+        b.innerHTML = `<span class="theme-dots"><i style="background:${t.swatch[0]}"></i><i style="background:${t.swatch[1]}"></i><i style="background:${t.swatch[2]}"></i></span><span class="theme-label">${t.nombre}</span>`;
+        b.addEventListener("click", () => {
+          selectedTheme = t.id;
+          applyTheme(t.id);
+          renderThemePicker();
+        });
+        themePicker.appendChild(b);
+      });
+    }
+    renderThemePicker();
+
+    function showErr(msg) {
+      const e = document.getElementById("err-msg");
+      e.textContent = msg;
+      e.classList.add("show");
+    }
+
+    document.getElementById("btn-save").addEventListener("click", async () => {
+      const name = document.getElementById("user-name-in").value.trim();
+      if (!name) return showErr("Escribe tu nombre para continuar.");
+      if (!selectedCareer) return showErr("Selecciona tu carrera.");
+
+      const btn = document.getElementById("btn-save");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner" style="border-top-color:#fff;"></span>';
+
+      const data = {
+        name,
+        career: selectedCareer,
+        theme: selectedTheme,
+        done: [],
+        createdAt: serverTimestamp(),
+      };
+
+      try {
+        await setDoc(doc(db, "users", auth.currentUser.uid), data);
+        window.location.href = "dashboard.html";
+      } catch (e) {
+        btn.disabled = false;
+        btn.textContent = "Guardar y ver mi malla";
+        showErr("No se pudo guardar tu perfil. Intenta de nuevo.");
+      }
+    });
+
+    // Protección de ruta: si no hay sesión, vuelve al login.
+    // Si ya tiene perfil guardado, va directo al dashboard.
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { window.location.href = "index.html"; return; }
+      const snap = await getDoc(doc(db, "users", user.uid));
+      if (snap.exists()) {
+        window.location.href = "dashboard.html";
+      } else {
+        if (user.displayName && !document.getElementById("user-name-in").value) {
+          document.getElementById("user-name-in").value = user.displayName;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
