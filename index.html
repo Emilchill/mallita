@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Malla Curricular ISC - UTESA</title>
+<style>
+  :root{
+    --bg:#0f1420;
+    --card:#161d2e;
+    --card-border:#242d42;
+    --text:#e7ecf5;
+    --muted:#8b95ab;
+    --approved:#1f8a4c;
+    --approved-border:#2fbf6b;
+    --unlocked:#1c2740;
+    --unlocked-border:#3a5a9e;
+    --locked:#141924;
+    --locked-border:#242c3d;
+    --accent:#4d8dff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:linear-gradient(180deg,#0b0f18,#0f1420 300px);
+    color:var(--text);
+    padding-bottom:60px;
+  }
+  header{
+    padding:28px 20px 18px;
+    text-align:center;
+    border-bottom:1px solid var(--card-border);
+    position:sticky;
+    top:0;
+    background:rgba(15,20,32,0.92);
+    backdrop-filter:blur(8px);
+    z-index:50;
+  }
+  header h1{margin:0 0 4px;font-size:1.4rem;}
+  header p{margin:0;color:var(--muted);font-size:0.85rem;}
+  #status{
+    font-size:0.75rem;
+    margin-top:8px;
+    color:var(--muted);
+  }
+  #progressWrap{
+    max-width:700px;
+    margin:14px auto 0;
+    padding:0 20px;
+  }
+  #progressBarBg{
+    background:var(--locked);
+    border-radius:20px;
+    height:10px;
+    overflow:hidden;
+    border:1px solid var(--card-border);
+  }
+  #progressBarFill{
+    height:100%;
+    background:linear-gradient(90deg,var(--accent),var(--approved-border));
+    width:0%;
+    transition:width .4s ease;
+  }
+  #progressText{
+    text-align:center;
+    font-size:0.75rem;
+    color:var(--muted);
+    margin-top:6px;
+  }
+  .container{
+    max-width:1400px;
+    margin:0 auto;
+    padding:20px;
+    display:flex;
+    gap:16px;
+    overflow-x:auto;
+  }
+  .cuatrimestre{
+    min-width:230px;
+    flex:1 0 230px;
+  }
+  .cuatrimestre h2{
+    font-size:0.85rem;
+    text-align:center;
+    color:var(--muted);
+    margin:0 0 10px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+  .materia{
+    background:var(--locked);
+    border:1px solid var(--locked-border);
+    border-radius:10px;
+    padding:10px 12px;
+    margin-bottom:10px;
+    cursor:pointer;
+    transition:all .15s ease;
+    user-select:none;
+    position:relative;
+  }
+  .materia:hover{transform:translateY(-2px);}
+  .materia.locked{opacity:0.45;cursor:not-allowed;}
+  .materia.locked:hover{transform:none;}
+  .materia.unlocked{
+    background:var(--unlocked);
+    border-color:var(--unlocked-border);
+  }
+  .materia.approved{
+    background:var(--approved);
+    border-color:var(--approved-border);
+  }
+  .materia .clave{
+    font-size:0.7rem;
+    color:var(--muted);
+    font-weight:600;
+  }
+  .materia.approved .clave{color:#d5f5e3;}
+  .materia .nombre{
+    font-size:0.8rem;
+    font-weight:600;
+    margin:2px 0 4px;
+    line-height:1.25;
+  }
+  .materia .cred{
+    font-size:0.68rem;
+    color:var(--muted);
+  }
+  .materia.approved .cred{color:#d5f5e3;}
+  .check{
+    position:absolute;
+    top:8px;
+    right:8px;
+    font-size:0.85rem;
+  }
+  .legend{
+    display:flex;
+    justify-content:center;
+    gap:18px;
+    flex-wrap:wrap;
+    padding:14px 20px 0;
+    font-size:0.75rem;
+    color:var(--muted);
+  }
+  .legend span{display:flex;align-items:center;gap:6px;}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  .dot.locked{background:var(--locked);border:1px solid var(--locked-border);}
+  .dot.unlocked{background:var(--unlocked);border:1px solid var(--unlocked-border);}
+  .dot.approved{background:var(--approved);border:1px solid var(--approved-border);}
+  #resetBtn{
+    display:block;
+    margin:24px auto 0;
+    background:none;
+    border:1px solid #6e2e2e;
+    color:#e08a8a;
+    padding:8px 16px;
+    border-radius:8px;
+    font-size:0.78rem;
+    cursor:pointer;
+  }
+  #resetBtn:hover{background:#2a1414;}
+  .tooltip{
+    font-size:0.68rem;
+    color:var(--muted);
+    margin-top:4px;
+    line-height:1.3;
+  }
+  @media (max-width:700px){
+    .container{flex-direction:column;}
+    .cuatrimestre{min-width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎓 Malla Curricular — Ingeniería en Sistemas Computacionales</h1>
+  <p>UTESA · Haz click en una materia para marcarla como aprobada</p>
+  <div id="status">Conectando...</div>
+  <div id="progressWrap">
+    <div id="progressBarBg"><div id="progressBarFill"></div></div>
+    <div id="progressText">0 / 0 créditos aprobados</div>
+  </div>
+</header>
+
+<div class="legend">
+  <span><i class="dot locked"></i> Bloqueada</span>
+  <span><i class="dot unlocked"></i> Disponible</span>
+  <span><i class="dot approved"></i> Aprobada</span>
+</div>
+
+<div class="container" id="mallaContainer"></div>
+
+<button id="resetBtn">Reiniciar mi progreso</button>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ============================================
+// PEGA AQUÍ TU CONFIG DE FIREBASE (te doy los pasos abajo)
+// ============================================
+const firebaseConfig = {
+  apiKey: "AIzaSyDYUFGIjFkEAYACGD2l8Rzoo1x4Qcd5KhE",
+  authDomain: "malla-curricular-38175.firebaseapp.com",
+  projectId: "malla-curricular-38175",
+  storageBucket: "malla-curricular-38175.firebasestorage.app",
+  messagingSenderId: "1010936934232",
+  appId: "1:1010936934232:web:5a6f313b80f9c879e47f2d"
+};
+
+let app, auth, db, userId;
+let firebaseReady = false;
+
+try{
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+  firebaseReady = true;
+}catch(e){
+  console.warn("Firebase no configurado todavía, usando localStorage.", e);
+}
+
+// ============================================
+// DATA DE LA MALLA (Pénsum ISC UTESA, Enero 2023)
+// ============================================
+const malla = [
+  { cuatrimestre: 1, materias: [
+    { clave:"ESP-181", nombre:"Lengua Española I", cred:4, prereq:[] },
+    { clave:"INF-117", nombre:"Algoritmos Computacionales", cred:4, prereq:[] },
+    { clave:"ING-105", nombre:"Inglés I", cred:0, prereq:[] },
+    { clave:"MAT-115", nombre:"Matemáticas Discretas", cred:4, prereq:[] },
+    { clave:"MAT-160", nombre:"Precálculo", cred:4, prereq:[] },
+    { clave:"MED-750", nombre:"Química Inorgánica I", cred:3, prereq:[] },
+    { clave:"MED-755", nombre:"Laboratorio de Química Inorgánica I", cred:1, prereq:[] },
+    { clave:"ORI-112", nombre:"Orientación Universitaria", cred:2, prereq:[] },
+    { clave:"SOC-182", nombre:"Reflexión Filosófica", cred:3, prereq:[] },
+  ]},
+  { cuatrimestre: 2, materias: [
+    { clave:"ESP-189", nombre:"Lengua Española II", cred:4, prereq:["ESP-181"] },
+    { clave:"INF-164", nombre:"Programación I", cred:3, prereq:["INF-117","MAT-115"] },
+    { clave:"INF-165", nombre:"Laboratorio de Programación I", cred:1, prereq:["INF-117","MAT-115"] },
+    { clave:"INF-204", nombre:"Lógica Computacional", cred:4, prereq:["MAT-115","INF-117"] },
+    { clave:"ING-115", nombre:"Inglés II", cred:0, prereq:["ING-105"] },
+    { clave:"MAT-170", nombre:"Cálculo I", cred:4, prereq:["MAT-160"] },
+    { clave:"MAT-190", nombre:"Física I", cred:4, prereq:["MAT-160"] },
+    { clave:"MAT-191", nombre:"Laboratorio de Física I", cred:1, prereq:["MAT-160"] },
+  ]},
+  { cuatrimestre: 3, materias: [
+    { clave:"ESP-302", nombre:"Redacción Profesional", cred:3, prereq:["ESP-189"] },
+    { clave:"INF-121", nombre:"Análisis de Sistemas", cred:4, prereq:["INF-164","INF-165"] },
+    { clave:"INF-167", nombre:"Programación II (Orientada a Objeto)", cred:3, prereq:["INF-164","INF-165"] },
+    { clave:"INF-168", nombre:"Laboratorio de Programación II", cred:1, prereq:["INF-164","INF-165"] },
+    { clave:"ING-125", nombre:"Inglés III", cred:0, prereq:["ING-115"] },
+    { clave:"MAT-306", nombre:"Pensamiento Lógico", cred:3, prereq:["MAT-160","SOC-182"] },
+    { clave:"MAT-340", nombre:"Cálculo II", cred:4, prereq:["MAT-170"] },
+    { clave:"MAT-500", nombre:"Física II", cred:4, prereq:["MAT-190","MAT-191"] },
+    { clave:"MAT-501", nombre:"Laboratorio de Física II", cred:1, prereq:["MAT-190","MAT-191"] },
+    { clave:"SOC-114", nombre:"Metodología de la Investigación I", cred:3, prereq:[] },
+  ]},
+  { cuatrimestre: 4, materias: [
+    { clave:"IEL-100", nombre:"Electricidad Básica", cred:3, prereq:["MAT-500","MAT-501"] },
+    { clave:"IEL-105", nombre:"Taller de Electricidad Básica", cred:1, prereq:["MAT-500","MAT-501"] },
+    { clave:"INF-171", nombre:"Diseño de Sistemas", cred:4, prereq:["INF-121","INF-167","INF-168"] },
+    { clave:"INF-172", nombre:"Programación III (Orientada a Objeto)", cred:3, prereq:["INF-121","INF-167","INF-168"] },
+    { clave:"INF-173", nombre:"Laboratorio de Programación III", cred:1, prereq:["INF-121","INF-167","INF-168"] },
+    { clave:"INF-385", nombre:"Base de Datos I", cred:3, prereq:["INF-121","INF-167","INF-168"] },
+    { clave:"INF-387", nombre:"Laboratorio de Base de Datos I", cred:1, prereq:["INF-121","INF-167","INF-168"] },
+    { clave:"ING-135", nombre:"Inglés IV", cred:0, prereq:["ING-125"] },
+    { clave:"MAT-134", nombre:"Fundamentos de Estadística", cred:2, prereq:["MAT-160"] },
+    { clave:"MAT-350", nombre:"Cálculo III", cred:4, prereq:["MAT-340"] },
+    { clave:"SOC-118", nombre:"Metodología de la Investigación II", cred:3, prereq:["SOC-114"] },
+    { clave:"SOC-172", nombre:"Debates de Historia Dominicana", cred:3, prereq:[] },
+  ]},
+  { cuatrimestre: 5, materias: [
+    { clave:"DIB-520", nombre:"Dibujo Técnico", cred:4, prereq:[] },
+    { clave:"IID-420", nombre:"Seguridad e Higiene Industrial", cred:3, prereq:[] },
+    { clave:"INF-440", nombre:"Arquitectura Computacional", cred:1, prereq:["INF-204","IEL-100","IEL-105"] },
+    { clave:"INF-445", nombre:"Laboratorio Arquitectura Computacional", cred:2, prereq:["INF-204","IEL-100","IEL-105"] },
+    { clave:"INF-481", nombre:"Base de Datos II", cred:2, prereq:["INF-171","INF-385","INF-387"] },
+    { clave:"INF-482", nombre:"Laboratorio de Base de Datos II", cred:1, prereq:["INF-171","INF-385","INF-387"] },
+    { clave:"INF-535", nombre:"Diseño y Programación de Páginas Web", cred:3, prereq:["INF-171","INF-385","INF-387"] },
+    { clave:"MAT-360", nombre:"Cálculo IV", cred:4, prereq:["MAT-350"] },
+    { clave:"SOC-502", nombre:"Ciudadanía y Globalización", cred:2, prereq:[] },
+  ]},
+  { cuatrimestre: 6, materias: [
+    { clave:"INF-184", nombre:"Sistemas Operativos", cred:2, prereq:["INF-440","INF-445"] },
+    { clave:"INF-185", nombre:"Laboratorio de Sistemas Operativos", cred:1, prereq:["INF-440","INF-445"] },
+    { clave:"INF-217", nombre:"Algoritmos y Estructuras de Datos", cred:2, prereq:["INF-172","INF-173"] },
+    { clave:"INF-218", nombre:"Laboratorio de Algoritmos y Estructuras de Datos", cred:1, prereq:["INF-172","INF-173"] },
+    { clave:"INF-225", nombre:"Proyecto Integrador I", cred:5, prereq:["_hasta5"] },
+    { clave:"INF-331", nombre:"Seminario de Informática", cred:3, prereq:["_hasta5"] },
+    { clave:"INF-640", nombre:"Minería de Datos", cred:3, prereq:["INF-481","INF-482"] },
+    { clave:"ING-168", nombre:"Inglés Profesional", cred:0, prereq:["ING-135"] },
+    { clave:"MAT-135", nombre:"Estadística para Ingenieros I", cred:3, prereq:["MAT-134"] },
+    { clave:"SOC-160", nombre:"Ética Profesional", cred:2, prereq:[] },
+  ]},
+  { cuatrimestre: 7, materias: [
+    { clave:"INF-502", nombre:"Inteligencia Artificial", cred:2, prereq:["INF-217","INF-218"] },
+    { clave:"INF-503", nombre:"Laboratorio Inteligencia Artificial", cred:2, prereq:["INF-217","INF-218"] },
+    { clave:"INF-700", nombre:"Computación Gráfica", cred:3, prereq:["INF-440","INF-445","INF-184","INF-185"] },
+    { clave:"INF-705", nombre:"Métodos Numéricos", cred:2, prereq:["MAT-360"] },
+    { clave:"INF-706", nombre:"Laboratorio Métodos Numéricos", cred:2, prereq:["MAT-360"] },
+    { clave:"INF-710", nombre:"Metodología Ágil", cred:3, prereq:["INF-167","INF-168"] },
+    { clave:"MAT-145", nombre:"Estadística para Ingenieros II", cred:3, prereq:["MAT-135"] },
+    { clave:"SIC-766", nombre:"Inteligencia Emocional", cred:2, prereq:[] },
+    { clave:"SOC-155", nombre:"Medio Ambiente y Sostenibilidad", cred:3, prereq:[] },
+  ]},
+  { cuatrimestre: 8, materias: [
+    { clave:"ECO-525", nombre:"Finanzas Personales", cred:2, prereq:[] },
+    { clave:"IID-725", nombre:"Investigación Operativa I", cred:3, prereq:["MAT-360"] },
+    { clave:"INF-241", nombre:"Ingeniería de Software I", cred:3, prereq:["INF-225"] },
+    { clave:"INF-810", nombre:"Auditoría de Sistemas Informáticos", cred:3, prereq:["INF-225"] },
+    { clave:"INF-840", nombre:"Programación de Dispositivos Móviles", cred:3, prereq:["INF-535","INF-700"] },
+    { clave:"PASANTIA", nombre:"Pasantía", cred:0, prereq:["_hasta7"] },
+  ]},
+  { cuatrimestre: 9, materias: [
+    { clave:"ADM-910", nombre:"Liderazgo y Desempeño", cred:3, prereq:[] },
+    { clave:"IID-830", nombre:"Investigación Operativa II", cred:3, prereq:["IID-725"] },
+    { clave:"INF-021", nombre:"Gestión de Proyecto Informático", cred:3, prereq:["INF-241"] },
+    { clave:"INF-411", nombre:"Redes y Comunicaciones", cred:3, prereq:["INF-440","INF-445","INF-184","INF-185"] },
+    { clave:"INF-412", nombre:"Laboratorio de Redes y Comunicaciones", cred:1, prereq:["INF-440","INF-445","INF-184","INF-185"] },
+    { clave:"INF-450", nombre:"Ingeniería de Software II", cred:3, prereq:["INF-241"] },
+    { clave:"INF-910", nombre:"Programación de Videojuegos", cred:3, prereq:["INF-700"] },
+    { clave:"ELECTIVA-9", nombre:"Electiva", cred:3, prereq:[] },
+  ]},
+  { cuatrimestre: 10, materias: [
+    { clave:"ADM-900", nombre:"Formación de Emprendedores", cred:3, prereq:["_hasta9"] },
+    { clave:"IID-945", nombre:"Ingeniería Económica", cred:3, prereq:["MAT-360"] },
+    { clave:"INF-344", nombre:"Telecomunicación de Datos", cred:2, prereq:["INF-411","INF-412"] },
+    { clave:"INF-345", nombre:"Laboratorio de Telecomunicación de Datos", cred:1, prereq:["INF-411","INF-412"] },
+    { clave:"INF-433", nombre:"Aseguramiento de Calidad del Software", cred:3, prereq:["INF-450"] },
+    { clave:"INF-920", nombre:"Compiladores", cred:4, prereq:["INF-502","INF-503","INF-184","INF-185"] },
+    { clave:"ELECTIVA-10", nombre:"Electiva", cred:3, prereq:[] },
+  ]},
+  { cuatrimestre: 11, materias: [
+    { clave:"DPG-010", nombre:"Anteproyecto de Grado", cred:4, prereq:["ADM-900"] },
+    { clave:"IID-025", nombre:"Diseño y Evaluación de Proyectos", cred:3, prereq:["IID-945"] },
+    { clave:"INF-025", nombre:"Algoritmos Paralelos", cred:3, prereq:["INF-705","INF-706"] },
+    { clave:"INF-820", nombre:"Seguridad Informática", cred:3, prereq:["INF-344","INF-345"] },
+    { clave:"ELECTIVA-11", nombre:"Electiva", cred:3, prereq:[] },
+  ]},
+  { cuatrimestre: 12, materias: [
+    { clave:"DPG-020", nombre:"Proyecto de Grado", cred:6, prereq:["_hasta11"] },
+  ]},
+  { cuatrimestre: 0, nombre_especial:"Electivas (mínimo 6 créditos)", materias: [
+    { clave:"CON-118", nombre:"Contabilidad I", cred:3, prereq:[] },
+    { clave:"IEL-200", nombre:"Circuitos Eléctricos I", cred:4, prereq:["IEL-100","IEL-105"] },
+    { clave:"IEL-205", nombre:"Taller de Circuitos Eléctricos I", cred:1, prereq:["IEL-100","IEL-105"] },
+    { clave:"INF-022", nombre:"Sistema y Tecnología de Información", cred:3, prereq:["INF-385","INF-387"] },
+    { clave:"INF-023", nombre:"Domótica y Entorno Inteligente", cred:3, prereq:["INF-344","INF-345"] },
+    { clave:"INF-024", nombre:"Administración de Negocios Electrónicos", cred:3, prereq:["INF-225"] },
+    { clave:"INF-026", nombre:"Robótica", cred:3, prereq:["INF-344","INF-345"] },
+    { clave:"INF-027", nombre:"Blockchain, Criptomonedas y Metaverso", cred:3, prereq:["INF-411","INF-412"] },
+  ]},
+];
+
+// Claves especiales de "aprobar todo hasta cuatrimestre X"
+function clavesHasta(n){
+  let out = [];
+  malla.forEach(c=>{
+    if(c.cuatrimestre>=1 && c.cuatrimestre<=n){
+      c.materias.forEach(m=>out.push(m.clave));
+    }
+  });
+  return out;
+}
+
+const allMaterias = [];
+malla.forEach(c=>c.materias.forEach(m=>allMaterias.push(m)));
+
+let approved = new Set();
+
+function isUnlocked(materia){
+  if(approved.has(materia.clave)) return true;
+  if(materia.prereq.length===0) return true;
+  for(const p of materia.prereq){
+    if(p==="_hasta5"){ if(!clavesHasta(5).every(c=>approved.has(c))) return false; continue; }
+    if(p==="_hasta7"){ if(!clavesHasta(7).every(c=>approved.has(c))) return false; continue; }
+    if(p==="_hasta9"){ if(!clavesHasta(9).every(c=>approved.has(c))) return false; continue; }
+    if(p==="_hasta11"){ if(!clavesHasta(11).every(c=>approved.has(c))) return false; continue; }
+    if(!approved.has(p)) return false;
+  }
+  return true;
+}
+
+function render(){
+  const container = document.getElementById("mallaContainer");
+  container.innerHTML = "";
+  malla.forEach(c=>{
+    const col = document.createElement("div");
+    col.className = "cuatrimestre";
+    const title = document.createElement("h2");
+    title.textContent = c.nombre_especial ? c.nombre_especial : `Cuatrimestre ${c.cuatrimestre}`;
+    col.appendChild(title);
+    c.materias.forEach(m=>{
+      const div = document.createElement("div");
+      const unlocked = isUnlocked(m);
+      const isApproved = approved.has(m.clave);
+      div.className = "materia " + (isApproved ? "approved" : (unlocked ? "unlocked" : "locked"));
+      div.innerHTML = `
+        <div class="clave">${m.clave}</div>
+        <div class="nombre">${m.nombre}</div>
+        <div class="cred">${m.cred} créditos</div>
+        ${isApproved ? '<span class="check">✅</span>' : ''}
+      `;
+      div.addEventListener("click", ()=>{
+        if(!unlocked && !isApproved) return;
+        toggleMateria(m.clave);
+      });
+      col.appendChild(div);
+    });
+    container.appendChild(col);
+  });
+  updateProgress();
+}
+
+function updateProgress(){
+  const totalCred = allMaterias.reduce((a,m)=>a+m.cred,0);
+  const doneCred = allMaterias.filter(m=>approved.has(m.clave)).reduce((a,m)=>a+m.cred,0);
+  const pct = totalCred ? Math.round((doneCred/totalCred)*100) : 0;
+  document.getElementById("progressBarFill").style.width = pct + "%";
+  document.getElementById("progressText").textContent = `${doneCred} / ${totalCred} créditos aprobados (${pct}%)`;
+}
+
+function toggleMateria(clave){
+  if(approved.has(clave)) approved.delete(clave);
+  else approved.add(clave);
+  saveProgress();
+  render();
+}
+
+// ============================================
+// PERSISTENCIA: Firebase si está configurado, si no localStorage
+// ============================================
+async function loadProgress(){
+  if(firebaseReady){
+    try{
+      const snap = await getDoc(doc(db,"progreso",userId));
+      if(snap.exists()){
+        approved = new Set(snap.data().materias || []);
+      }
+    }catch(e){ console.error(e); }
+  } else {
+    const raw = localStorage.getItem("malla_progreso");
+    approved = new Set(raw ? JSON.parse(raw) : []);
+  }
+  render();
+}
+
+async function saveProgress(){
+  if(firebaseReady){
+    try{
+      await setDoc(doc(db,"progreso",userId), { materias: Array.from(approved), actualizado: new Date().toISOString() });
+    }catch(e){ console.error(e); }
+  } else {
+    localStorage.setItem("malla_progreso", JSON.stringify(Array.from(approved)));
+  }
+}
+
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  if(confirm("¿Seguro que quieres borrar todo tu progreso?")){
+    approved = new Set();
+    saveProgress();
+    render();
+  }
+});
+
+// ============================================
+// INICIO
+// ============================================
+if(firebaseReady){
+  onAuthStateChanged(auth, async (user)=>{
+    if(user){
+      userId = user.uid;
+      document.getElementById("status").textContent = "✅ Conectado — guardando tu progreso automáticamente";
+      await loadProgress();
+    } else {
+      signInAnonymously(auth).catch(err=>{
+        console.error(err);
+        document.getElementById("status").textContent = "⚠️ Error conectando a Firebase, usando almacenamiento local";
+        firebaseReady = false;
+        loadProgress();
+      });
+    }
+  });
+} else {
+  document.getElementById("status").textContent = "💾 Guardando localmente en este navegador";
+  loadProgress();
+}
+</script>
+
+</body>
+</html>
