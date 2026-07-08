@@ -1,6 +1,0 @@
-{
-  "name": "Malla UTESA",
-  "description": "Herramienta independiente para estudiantes de UTESA para llevar el control de su malla curricular cuatrimestre a cuatrimestre, marcar materias aprobadas y ver su avance académico.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
