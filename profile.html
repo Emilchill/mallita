@@ -3,99 +3,136 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mi Malla · Malla UTESA</title>
+<title>Completa tu perfil · Malla UTESA</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <!-- Loader mientras se verifica la sesión -->
-  <div id="loader" class="full-loader">
-    <div class="spinner-lg"></div>
-    <p class="muted" style="font-size:13.5px;">Cargando tu malla…</p>
+  <div class="disclaimer-strip">
+    <strong>Proyecto estudiantil independiente</strong> — no es un sitio oficial de UTESA.
   </div>
 
-  <div id="app" class="hidden">
-    <header class="dash-header">
-      <div class="dash-header-inner">
-        <div class="brand">
-          <div class="brand-mark" id="brand-mark">U</div>
-          <div class="brand-text">
-            <div class="name" id="hi-name">Hola</div>
-            <div class="sub" id="hi-career">—</div>
-          </div>
-        </div>
-        <div class="header-actions">
-          <button class="icon-btn" id="btn-theme" title="Cambiar tema" aria-haspopup="true" aria-expanded="false">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"></circle><circle cx="17.5" cy="10.5" r=".5"></circle><circle cx="8.5" cy="7.5" r=".5"></circle><circle cx="6.5" cy="12.5" r=".5"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.2-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-4.4-4-8-10-8Z"></path></svg>
-          </button>
-          <button class="btn btn-danger-text" id="btn-logout">Cerrar sesión</button>
-        </div>
+  <div class="profile-shell">
+    <div class="card profile-box">
+      <span class="kicker" style="color:var(--primary); font-weight:700; font-size:12.5px; text-transform:uppercase; letter-spacing:.07em;">Último paso</span>
+      <h2 style="margin:8px 0 4px; font-size:25px;">Cuéntanos un poco de ti</h2>
+      <p class="sub muted" style="margin-bottom:22px; font-size:14.5px;">Esto nos permite mostrarte el pensum correcto y tu progreso real.</p>
+
+      <div class="field">
+        <label class="field-label" for="user-name-in">Nombre completo</label>
+        <input class="input" type="text" id="user-name-in" placeholder="Ej. Juan Pérez" autocomplete="name">
       </div>
 
-      <!-- Popover de temas -->
-      <div class="theme-pop" id="theme-pop">
-        <div class="title">Tema de color</div>
-        <div id="theme-picker-container"></div>
+      <div class="field">
+        <label class="field-label">Tu carrera</label>
+        <div class="career-grid" id="career-grid"></div>
       </div>
-    </header>
 
-    <section class="dash-hero">
-      <div class="hero-grid">
-        <div class="card progress-card">
-          <div class="ring-wrap">
-            <svg viewBox="0 0 120 120">
-              <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
-              <circle class="ring-fg" id="ring-fg" cx="60" cy="60" r="52" stroke-dasharray="326.7" stroke-dashoffset="326.7"></circle>
-            </svg>
-            <div class="ring-center">
-              <div class="pct" id="perc-txt">0%</div>
-              <div class="lbl">avance</div>
-            </div>
-          </div>
-          <div class="stat-line" id="perc-desc">Cargando…</div>
-        </div>
+      <div class="field">
+        <label class="field-label">Elige un tema de color (puedes cambiarlo luego)</label>
+        <div id="theme-picker" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+      </div>
 
-        <div class="stats-row">
-          <div class="card stat-box">
-            <div class="num" id="stat-done">0</div>
-            <div class="lbl">Materias aprobadas</div>
-          </div>
-          <div class="card stat-box">
-            <div class="num" id="stat-pending">0</div>
-            <div class="lbl">Materias pendientes</div>
-          </div>
-          <div class="card stat-box">
-            <div class="num" id="stat-credits">0 / 0</div>
-            <div class="lbl">Créditos completados</div>
-            <div class="credits-bar-track"><div class="credits-bar-fill" id="credits-bar-fill" style="width:0%"></div></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <div class="toolbar">
-      <div class="search-box">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.35-4.35"></path></svg>
-        <input class="input" type="text" id="search-input" placeholder="Buscar materia o clave (ej. IEL-300)">
-      </div>
-      <div class="filter-chips" id="filter-chips">
-        <button class="chip chip-active" data-filter="all">Todas</button>
-        <button class="chip" data-filter="done">Aprobadas</button>
-        <button class="chip" data-filter="pending">Pendientes</button>
-        <button class="chip" data-filter="electivas">Electivas</button>
-      </div>
+      <button class="btn btn-primary" id="btn-save" style="width:100%; margin-top:6px;">Guardar y ver mi malla</button>
+      <div class="err-box" id="err-msg"></div>
     </div>
-
-    <main class="malla-wrap" id="malla-content"></main>
-
-    <footer class="page-footer">
-      Malla UTESA es un proyecto independiente hecho por estudiantes para estudiantes.<br>
-      Los datos del pensum corresponden a la Resolución No. 104-22 (enero 2023) y pueden cambiar — verifica siempre la información oficial con tu coordinación de carrera.
-    </footer>
   </div>
 
-  <div class="toast" id="toast"></div>
+  <script type="module">
+    import { auth, db } from "./js/firebase-config.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { PENSUMS } from "./js/pensums-data.js";
+    import { THEMES, getLocalTheme, applyTheme } from "./js/theme.js";
 
-  <script type="module" src="js/dashboard.js"></script>
+    applyTheme(getLocalTheme());
+
+    let selectedCareer = null;
+    let selectedTheme = getLocalTheme();
+
+    // Construir tarjetas de carrera dinámicamente desde pensums-data.js
+    const careerGrid = document.getElementById("career-grid");
+    Object.values(PENSUMS).forEach(p => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "career-option";
+      btn.dataset.key = p.key;
+      btn.innerHTML = `
+        <span class="career-badge" style="background:${p.color}">${p.key}</span>
+        <span class="career-info">
+          <strong>${p.nombre}</strong>
+          <span>${p.titulo} · ${p.totalCreditos} créditos</span>
+        </span>
+      `;
+      btn.addEventListener("click", () => {
+        selectedCareer = p.key;
+        document.querySelectorAll(".career-option").forEach(el => el.classList.remove("selected"));
+        btn.classList.add("selected");
+      });
+      careerGrid.appendChild(btn);
+    });
+
+    // Selector de temas simple (sin persistencia en Firestore todavía, se guarda al final)
+    const themePicker = document.getElementById("theme-picker");
+    function renderThemePicker() {
+      themePicker.innerHTML = "";
+      THEMES.forEach(t => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "theme-swatch" + (t.id === selectedTheme ? " theme-active" : "");
+        b.style.width = "auto";
+        b.style.flexDirection = "row";
+        b.innerHTML = `<span class="theme-dots"><i style="background:${t.swatch[0]}"></i><i style="background:${t.swatch[1]}"></i><i style="background:${t.swatch[2]}"></i></span><span class="theme-label">${t.nombre}</span>`;
+        b.addEventListener("click", () => {
+          selectedTheme = t.id;
+          applyTheme(t.id);
+          renderThemePicker();
+        });
+        themePicker.appendChild(b);
+      });
+    }
+    renderThemePicker();
+
+    function showErr(msg) {
+      const e = document.getElementById("err-msg");
+      e.textContent = msg;
+      e.classList.add("show");
+    }
+
+    document.getElementById("btn-save").addEventListener("click", async () => {
+      const name = document.getElementById("user-name-in").value.trim();
+      if (!name) return showErr("Escribe tu nombre para continuar.");
+      if (!selectedCareer) return showErr("Selecciona tu carrera.");
+
+      const btn = document.getElementById("btn-save");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner" style="border-top-color:#fff;"></span>';
+
+      const data = {
+        name,
+        career: selectedCareer,
+        theme: selectedTheme,
+        done: [],
+        createdAt: serverTimestamp(),
+      };
+
+      try {
+        await setDoc(doc(db, "users", auth.currentUser.uid), data);
+        window.location.href = "dashboard.html";
+      } catch (e) {
+        btn.disabled = false;
+        btn.textContent = "Guardar y ver mi malla";
+        showErr("No se pudo guardar tu perfil. Intenta de nuevo.");
+      }
+    });
+
+    // Protección de ruta: si no hay sesión, vuelve al login.
+    // Si ya tiene perfil guardado, va directo al dashboard.
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { window.location.href = "index.html"; return; }
+      const snap = await getDoc(doc(db, "users", user.uid));
+      if (snap.exists()) window.location.href = "dashboard.html";
+    });
+  </script>
 </body>
 </html>
