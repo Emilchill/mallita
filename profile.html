@@ -131,7 +131,13 @@
     onAuthStateChanged(auth, async (user) => {
       if (!user) { window.location.href = "index.html"; return; }
       const snap = await getDoc(doc(db, "users", user.uid));
-      if (snap.exists()) window.location.href = "dashboard.html";
+      if (snap.exists()) {
+        window.location.href = "dashboard.html";
+      } else {
+        if (user.displayName && !document.getElementById("user-name-in").value) {
+          document.getElementById("user-name-in").value = user.displayName;
+        }
+      }
     });
   </script>
 </body>

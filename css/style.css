@@ -437,3 +437,39 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 @keyframes spin { to { transform: rotate(360deg); } }
 .full-loader { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
 .full-loader .spinner-lg { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--border); border-top-color: var(--primary); animation: spin .8s linear infinite; }
+
+/* ---------- Google Login & Divider ---------- */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 18px 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.auth-divider::before, .auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1.5px solid var(--border);
+}
+.auth-divider:not(:empty)::before {
+  margin-right: 12px;
+}
+.auth-divider:not(:empty)::after {
+  margin-left: 12px;
+}
+
+.btn-google {
+  background: var(--card) !important;
+  color: var(--text) !important;
+  border: 1.5px solid var(--border) !important;
+  box-shadow: none !important;
+  transition: background .15s ease, border-color .15s ease !important;
+}
+.btn-google:hover {
+  background: var(--bg-soft) !important;
+  border-color: var(--muted) !important;
+}
