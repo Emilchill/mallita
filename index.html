@@ -3,30 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Malla Estudiantil Interactiva</title>
+    <title>Malla Estudiantil | Proyecto Estudiantes</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --p: #006837; --bg: #f8fafc; --card: #ffffff; --txt: #1e293b; }
+        :root { --p: #006837; --bg: #f3f4f6; --card: #ffffff; --txt: #1e293b; }
         [data-theme="dark"] { --p: #3b82f6; --bg: #0f172a; --card: #1e293b; --txt: #f8fafc; }
         [data-theme="sunset"] { --p: #f97316; --bg: #fff7ed; --card: #ffffff; --txt: #431407; }
-        [data-theme="ocean"] { --p: #0891b2; --bg: #f0f9ff; --card: #ffffff; --txt: #164e63; }
 
-        body { background: var(--bg); color: var(--txt); transition: 0.3s; font-family: 'Inter', sans-serif; }
-        .card { background: var(--card); border-radius: 1.5rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
-        
-        .tab-btn { border-bottom: 2px solid transparent; opacity: 0.5; transition: 0.3s; }
-        .tab-btn.active { border-bottom-color: var(--p); opacity: 1; color: var(--p); font-weight: bold; }
-
-        .subject-card { 
-            border: 1px solid rgba(0,0,0,0.1); transition: 0.2s; cursor: pointer; 
-            padding: 12px; border-radius: 12px; display: flex; flex-direction: column; 
-            justify-content: space-between; min-height: 100px; font-size: 11px;
-        }
-        .subject-card.done { background: var(--p) !important; color: white !important; border-color: var(--p); transform: scale(1.02); }
-        
-        .progress-ring__circle { transition: 0.8s stroke-dashoffset; stroke: var(--p); transform: rotate(-90deg); transform-origin: 50% 50%; }
+        body { background: var(--bg); color: var(--txt); transition: 0.3s; font-family: sans-serif; }
+        .card { background: var(--card); border-radius: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .subject-card { border: 1px solid rgba(0,0,0,0.1); padding: 10px; border-radius: 12px; min-height: 90px; cursor: pointer; font-size: 11px; }
+        .subject-card.done { background: var(--p) !important; color: white !important; }
         .hidden { display: none; }
+        .tab-active { border-bottom: 3px solid var(--p); font-weight: bold; color: var(--p); }
     </style>
 </head>
 <body class="min-h-screen">
@@ -34,80 +23,56 @@
     <!-- LOGIN / REGISTRO -->
     <div id="view-auth" class="flex items-center justify-center min-h-screen p-6">
         <div class="card p-8 w-full max-w-md">
-            <div class="text-center mb-8">
-                <h1 class="text-3xl font-black text-[var(--p)]">Malla Estudiantil</h1>
-                <p class="text-[10px] font-bold opacity-40 uppercase tracking-widest">Calcula tu progreso real</p>
-            </div>
+            <h1 class="text-3xl font-black text-center mb-6 text-[var(--p)]">Malla Estudiantil</h1>
             
             <div class="flex mb-6 border-b">
-                <button onclick="setAuthMode('login')" id="tab-login" class="tab-btn flex-1 py-2 active">Entrar</button>
-                <button onclick="setAuthMode('register')" id="tab-register" class="tab-btn flex-1 py-2">Crear Cuenta</button>
+                <button onclick="setAuthMode('login')" id="t-login" class="flex-1 py-2 tab-active">Iniciar Sesión</button>
+                <button onclick="setAuthMode('register')" id="t-reg" class="flex-1 py-2 opacity-50">Registrarme</button>
             </div>
 
             <div class="space-y-4">
-                <input type="email" id="email" placeholder="Correo electrónico" class="w-full p-3 border rounded-xl text-black outline-none focus:ring-2 focus:ring-[var(--p)]">
-                <input type="password" id="pass" placeholder="Contraseña (min. 6)" class="w-full p-3 border rounded-xl text-black outline-none focus:ring-2 focus:ring-[var(--p)]">
-                <button onclick="handleAuth()" id="auth-submit" class="w-full bg-[var(--p)] text-white p-3 rounded-xl font-bold shadow-lg">Iniciar Sesión</button>
-                <p id="auth-error" class="text-xs text-red-500 text-center font-bold h-4"></p>
+                <input type="email" id="email" placeholder="Correo electrónico" class="w-full p-3 border rounded-xl text-black outline-none border-gray-300">
+                <input type="password" id="pass" placeholder="Contraseña (mín. 6)" class="w-full p-3 border rounded-xl text-black outline-none border-gray-300">
+                <button onclick="handleAuthAction()" id="btn-auth" class="w-full bg-[var(--p)] text-white p-3 rounded-xl font-bold">Entrar</button>
+                <p id="err-msg" class="text-xs text-red-500 text-center font-bold"></p>
             </div>
         </div>
     </div>
 
-    <!-- CONFIGURAR PERFIL -->
+    <!-- PERFIL -->
     <div id="view-profile" class="hidden flex items-center justify-center min-h-screen p-6">
         <div class="card p-8 w-full max-w-md">
-            <h2 class="text-2xl font-bold mb-2 italic">¡Hola!</h2>
-            <p class="text-sm opacity-50 mb-6">Dinos quién eres para preparar tu malla.</p>
+            <h2 class="text-2xl font-bold mb-4 italic">Perfil Estudiantil</h2>
             <div class="space-y-4">
-                <input type="text" id="p-name" placeholder="Tu nombre completo" class="w-full p-3 border rounded-xl text-black">
-                <select id="p-career" class="w-full p-3 border rounded-xl text-black">
-                    <option value="">Selecciona tu Carrera</option>
-                    <option value="ISC">Ingeniería en Sistemas</option>
+                <input type="text" id="user-name-in" placeholder="Tu nombre" class="w-full p-3 border rounded-xl text-black">
+                <select id="user-career-in" class="w-full p-3 border rounded-xl text-black">
+                    <option value="ISC">Sistemas Computacionales</option>
                     <option value="IEL">Ingeniería Eléctrica</option>
                     <option value="IID">Ingeniería Industrial</option>
                 </select>
-                <input type="number" id="p-age" placeholder="Tu edad" class="w-full p-3 border rounded-xl text-black">
-                <button onclick="completeProfile()" class="w-full bg-[var(--p)] text-white p-3 rounded-xl font-bold">Ver mi Malla</button>
+                <button onclick="finishProfile()" class="w-full bg-[var(--p)] text-white p-3 rounded-xl font-bold">Guardar y Continuar</button>
             </div>
         </div>
     </div>
 
     <!-- DASHBOARD -->
-    <div id="view-dash" class="hidden min-h-screen pb-20">
-        <header class="p-6 flex justify-between items-center max-w-7xl mx-auto">
+    <div id="view-dash" class="hidden min-h-screen p-6">
+        <header class="max-w-7xl mx-auto flex justify-between items-center mb-10">
             <div>
-                <h1 id="user-name" class="text-3xl font-black italic tracking-tighter">Hola</h1>
-                <p id="user-career" class="text-xs font-bold opacity-40 uppercase tracking-[0.2em]"></p>
+                <h1 id="hi-name" class="text-3xl font-black italic">Hola</h1>
+                <p id="hi-career" class="text-xs font-bold opacity-50 uppercase"></p>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="flex bg-white p-2 rounded-2xl shadow-sm gap-2">
-                    <button onclick="setTheme('utesa')" class="w-5 h-5 rounded-full bg-[#006837] border-2 border-white"></button>
-                    <button onclick="setTheme('dark')" class="w-5 h-5 rounded-full bg-[#3b82f6] border-2 border-white"></button>
-                    <button onclick="setTheme('sunset')" class="w-5 h-5 rounded-full bg-[#f97316] border-2 border-white"></button>
-                </div>
-                <button onclick="logout()" class="text-red-500 font-bold text-xs uppercase">Salir</button>
-            </div>
+            <button onclick="logout()" class="text-red-500 font-bold">SALIR</button>
         </header>
 
-        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div class="lg:col-span-1">
-                <div class="card p-8 text-center sticky top-10">
-                    <h3 class="text-[10px] font-black opacity-30 uppercase mb-6 tracking-widest">Mi Progreso</h3>
-                    <div class="relative inline-flex items-center justify-center">
-                        <svg width="180" height="180">
-                            <circle class="text-gray-100" stroke-width="12" stroke="currentColor" fill="transparent" r="75" cx="90" cy="90"/>
-                            <circle id="prog-circle" class="progress-ring__circle" stroke-width="12" stroke-linecap="round" fill="transparent" r="75" cx="90" cy="90" stroke-dasharray="471.2" stroke-dashoffset="471.2"/>
-                        </svg>
-                        <span id="prog-val" class="absolute text-4xl font-black text-[var(--p)]">0%</span>
-                    </div>
-                    <p id="prog-desc" class="mt-8 text-xs font-medium opacity-50 italic px-4"></p>
-                </div>
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div class="lg:col-span-1 text-center card p-6">
+                <h3 class="text-xs font-black opacity-30 mb-4">MI PROGRESO</h3>
+                <div class="text-5xl font-black text-[var(--p)]" id="perc-txt">0%</div>
+                <p id="perc-desc" class="text-xs mt-4 italic opacity-60"></p>
             </div>
-
-            <div class="lg:col-span-3 card p-6 md:p-10">
-                <div id="malla-grid" class="space-y-12 text-black">
-                    <!-- Se rellena con JS -->
-                </div>
+            <div class="lg:col-span-3 card p-8">
+                <div id="malla-content" class="space-y-10"></div>
             </div>
         </div>
     </div>
@@ -130,50 +95,45 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let authMode = 'login';
-        let userState = null;
+        let mode = 'login';
+        let userData = null;
 
-        // --- LOS PENSUMS (De tus archivos) ---
         const PENSUMS = {
-            "ISC": { name: "Ing. en Sistemas", malla: [
-                { cuat: 1, mat: [{id:"ESP-181", n:"Español I", c:4}, {id:"INF-117", n:"Algoritmos", c:4}, {id:"MAT-160", n:"Precálculo", c:4}, {id:"INF-103", n:"Ofimática", c:2}, {id:"MED-750", n:"Química I", c:3}] },
-                { cuat: 2, mat: [{id:"INF-164", n:"Prog I", c:3}, {id:"INF-204", n:"Lógica", c:4}, {id:"MAT-170", n:"Cálculo I", c:4}, {id:"MAT-190", n:"Física I", c:4}, {id:"ESP-189", n:"Español II", c:4}] },
-                { cuat: 3, mat: [{id:"INF-121", n:"Análisis Sist.", c:4}, {id:"INF-167", n:"Prog II", c:3}, {id:"MAT-340", n:"Cálculo II", c:4}, {id:"MAT-500", n:"Física II", c:4}, {id:"SOC-114", n:"Metodología I", c:3}] },
-                { cuat: 4, mat: [{id:"INF-171", n:"Diseño Sist.", c:4}, {id:"INF-172", n:"Prog III", c:3}, {id:"INF-385", n:"Base de Datos I", c:3}, {id:"MAT-350", n:"Cálculo III", c:4}, {id:"SOC-172", n:"Hist. Dom.", c:3}] }
-            ]},
-            "IEL": { name: "Ing. Eléctrica", malla: [
-                { cuat: 1, mat: [{id:"IEL-130", n:"Hist. Eléctrica", c:2}, {id:"IEL-140", n:"Int. Ing. Eléc.", c:2}, {id:"MAT-160", n:"Precálculo", c:4}, {id:"ESP-181", n:"Español I", c:4}, {id:"SOC-182", n:"Filosofía", c:3}] },
-                { cuat: 2, mat: [{id:"IEL-100", n:"Elec. Básica", c:3}, {id:"IEL-105", n:"Taller Elec.", c:1}, {id:"MAT-170", n:"Cálculo I", c:4}, {id:"MAT-190", n:"Física I", c:4}, {id:"ING-105", n:"Inglés I", c:0}] },
-                { cuat: 3, mat: [{id:"IEL-200", n:"Circuitos I", c:4}, {id:"IEL-205", n:"Taller Circ. I", c:1}, {id:"IMC-102", n:"CAD Ing.", c:4}, {id:"MAT-306", n:"Pens. Lógico", c:3}] }
-            ]},
-            "IID": { name: "Ing. Industrial", malla: [
-                { cuat: 1, mat: [{id:"ARQ-130", n:"Geometría Desc.", c:4}, {id:"IID-105", n:"Int. Ing. Ind.", c:2}, {id:"MAT-160", n:"Precálculo", c:4}, {id:"ESP-181", n:"Español I", c:4}, {id:"SOC-182", n:"Filosofía", c:3}] },
-                { cuat: 2, mat: [{id:"IID-480", n:"Est. Trabajo", c:3}, {id:"INF-117", n:"Algoritmos", c:4}, {id:"MAT-170", n:"Cálculo I", c:4}, {id:"ESP-189", n:"Español II", c:4}, {id:"ING-105", n:"Inglés I", c:0}] },
-                { cuat: 3, mat: [{id:"IID-420", n:"Seguridad Ind.", c:3}, {id:"MAT-340", n:"Cálculo II", c:4}, {id:"MED-770", n:"Química Org.", c:3}, {id:"SOC-114", n:"Metodología I", c:3}] }
-            ]}
+            "ISC": { name: "Sistemas", malla: [{c:1, m:[{id:"INF117",n:"Algoritmos",cr:4},{id:"MAT160",n:"Precalculo",cr:4}]}, {c:2, m:[{id:"INF164",n:"Prog I",cr:3},{id:"MAT170",n:"Calculo I",cr:4}]}] },
+            "IEL": { name: "Eléctrica", malla: [{c:1, m:[{id:"IEL130",n:"Hist. Eléc",cr:2},{id:"MAT160",n:"Precalculo",cr:4}]}] },
+            "IID": { name: "Industrial", malla: [{c:1, m:[{id:"IID105",n:"Int. Industrial",cr:2},{id:"MAT160",n:"Precalculo",cr:4}]}] }
         };
 
-        // --- LOGICA DE AUTENTICACION ---
-        window.setAuthMode = (mode) => {
-            authMode = mode;
-            document.getElementById('tab-login').classList.toggle('active', mode === 'login');
-            document.getElementById('tab-register').classList.toggle('active', mode === 'register');
-            document.getElementById('auth-submit').innerText = mode === 'login' ? 'Iniciar Sesión' : 'Crear Cuenta Estudiantil';
+        window.setAuthMode = (m) => {
+            mode = m;
+            document.getElementById('t-login').className = m === 'login' ? 'flex-1 py-2 tab-active' : 'flex-1 py-2 opacity-50';
+            document.getElementById('t-reg').className = m === 'register' ? 'flex-1 py-2 tab-active' : 'flex-1 py-2 opacity-50';
+            document.getElementById('btn-auth').innerText = m === 'login' ? 'Entrar' : 'Registrar Cuenta';
         };
 
-        window.handleAuth = async () => {
-            const email = document.getElementById('email').value;
+        window.handleAuthAction = async () => {
+            const email = document.getElementById('email').value.trim();
             const pass = document.getElementById('pass').value;
-            const err = document.getElementById('auth-error');
-            err.innerText = "";
+            const err = document.getElementById('err-msg');
+            err.innerText = "Procesando...";
 
-            if(pass.length < 6) return err.innerText = "Contraseña min. 6 caracteres";
+            if(!email || pass.length < 6) {
+                err.innerText = "Email válido y clave de 6+ caracteres.";
+                return;
+            }
 
             try {
-                if(authMode === 'login') await signInWithEmailAndPassword(auth, email, pass);
-                else await createUserWithEmailAndPassword(auth, email, pass);
+                if(mode === 'login') {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                } else {
+                    await createUserWithEmailAndPassword(auth, email, pass);
+                }
             } catch (e) {
-                err.innerText = "Correo o clave incorrectos";
+                console.error(e.code);
+                if(e.code === 'auth/user-not-found') err.innerText = "El usuario no existe. ¡Regístrate!";
+                else if(e.code === 'auth/wrong-password') err.innerText = "Contraseña incorrecta.";
+                else if(e.code === 'auth/email-already-in-use') err.innerText = "Ese correo ya tiene cuenta.";
+                else err.innerText = "Error: " + e.code;
             }
         };
 
@@ -181,83 +141,67 @@
             if (user) {
                 const snap = await getDoc(doc(db, "users", user.uid));
                 if (snap.exists()) {
-                    userState = snap.data();
-                    renderDashboard();
-                } else showView('view-profile');
-            } else showView('view-auth');
+                    userData = snap.data();
+                    renderDash();
+                } else { showView('view-profile'); }
+            } else { showView('view-auth'); }
         });
 
-        window.completeProfile = async () => {
-            const name = document.getElementById('p-name').value;
-            const career = document.getElementById('p-career').value;
-            const age = document.getElementById('p-age').value;
-            if(!name || !career) return alert("Llena todos los campos");
-
-            const data = { name, careerCode: career, age, done: [], theme: 'utesa' };
-            await setDoc(doc(db, "users", auth.currentUser.uid), data);
-            userState = data;
-            renderDashboard();
+        window.finishProfile = async () => {
+            const name = document.getElementById('user-name-in').value;
+            const career = document.getElementById('user-career-in').value;
+            if(!name) return alert("Pon tu nombre");
+            const d = { name, career, done: [] };
+            await setDoc(doc(db, "users", auth.currentUser.uid), d);
+            userData = d;
+            renderDash();
         };
 
-        // --- DASHBOARD UI ---
-        function renderDashboard() {
+        function renderDash() {
             showView('view-dash');
-            setTheme(userState.theme || 'utesa');
-            document.getElementById('user-name').innerText = `Hola, ${userState.name}`;
-            const info = PENSUMS[userState.careerCode];
-            document.getElementById('user-career').innerText = info.name;
-
-            const grid = document.getElementById('malla-grid');
-            grid.innerHTML = '';
-
-            info.malla.forEach(cuat => {
-                const sec = document.createElement('div');
-                sec.innerHTML = `<h4 class="text-[10px] font-black opacity-30 uppercase mb-4 tracking-widest">Cuatrimestre ${cuat.cuat}</h4>`;
-                const mGrid = document.createElement('div');
-                mGrid.className = "grid grid-cols-2 md:grid-cols-4 gap-4";
-                
-                cuat.mat.forEach(m => {
-                    const isDone = userState.done.includes(m.id);
+            document.getElementById('hi-name').innerText = `Hola, ${userData.name}`;
+            const p = PENSUMS[userData.career];
+            document.getElementById('hi-career').innerText = p.name;
+            
+            const cont = document.getElementById('malla-content');
+            cont.innerHTML = '';
+            
+            p.malla.forEach(cuat => {
+                const div = document.createElement('div');
+                div.innerHTML = `<h4 class="text-[10px] font-bold opacity-30 mb-4 uppercase tracking-widest">Cuatrimestre ${cuat.c}</h4>`;
+                const g = document.createElement('div');
+                g.className = "grid grid-cols-2 md:grid-cols-4 gap-4";
+                cuat.m.forEach(m => {
+                    const isDone = userData.done.includes(m.id);
                     const card = document.createElement('div');
-                    card.className = `subject-card card ${isDone ? 'done' : 'bg-white'}`;
-                    card.innerHTML = `<span class="opacity-40 font-bold">${m.id}</span><span class="font-bold my-1 text-center leading-tight">${m.n}</span><span class="opacity-40 text-right italic font-black">${m.c} CR</span>`;
+                    card.className = `subject-card card ${isDone ? 'done' : 'bg-white text-black'}`;
+                    card.innerHTML = `<span class="opacity-40">${m.id}</span><span class="font-bold my-1 text-center">${m.n}</span><span class="opacity-40 text-right italic">${m.cr} CR</span>`;
                     card.onclick = () => toggleSubject(m.id);
-                    mGrid.appendChild(card);
+                    g.appendChild(card);
                 });
-                sec.appendChild(mGrid);
-                grid.appendChild(sec);
+                div.appendChild(g);
+                cont.appendChild(div);
             });
-            updateProgress();
+            updateStats();
         }
 
         async function toggleSubject(id) {
-            let list = [...userState.done];
+            let list = [...userData.done];
             if(list.includes(id)) list = list.filter(i => i !== id);
             else list.push(id);
-            userState.done = list;
+            userData.done = list;
             await updateDoc(doc(db, "users", auth.currentUser.uid), { done: list });
-            renderDashboard();
+            renderDash();
         }
 
-        function updateProgress() {
-            const info = PENSUMS[userState.careerCode];
-            const total = info.malla.flatMap(c => c.mat).length;
-            const done = userState.done.length;
-            const perc = Math.round((done / total) * 100) || 0;
-
-            document.getElementById('prog-val').innerText = perc + "%";
-            const circle = document.getElementById('prog-circle');
-            circle.style.strokeDashoffset = 471.2 - (perc / 100 * 471.2);
-
-            let desc = perc < 50 ? "Estás construyendo tus cimientos. ¡Sigue adelante!" : "¡Ya pasaste la mitad! El título está cerca.";
-            if(perc === 100) desc = "¡Felicidades! Has completado el pensum.";
-            document.getElementById('prog-desc').innerText = desc;
+        function updateStats() {
+            const info = PENSUMS[userData.career];
+            const total = info.malla.flatMap(c => c.m).length;
+            const done = userData.done.length;
+            const perc = Math.round((done/total)*100) || 0;
+            document.getElementById('perc-txt').innerText = perc + "%";
+            document.getElementById('perc-desc').innerText = `Has completado ${done} de ${total} materias del pensum.`;
         }
-
-        window.setTheme = async (t) => {
-            document.documentElement.setAttribute('data-theme', t);
-            if(userState) await updateDoc(doc(db, "users", auth.currentUser.uid), { theme: t });
-        };
 
         function showView(id) {
             ['view-auth', 'view-profile', 'view-dash'].forEach(v => document.getElementById(v).classList.add('hidden'));
